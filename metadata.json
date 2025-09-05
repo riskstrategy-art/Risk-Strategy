@@ -1,0 +1,5 @@
+{
+  "name": "Risk Maturity Snapshot",
+  "description": "An interactive web app for C-suite executives and NFP leaders to assess their organization's enterprise risk management maturity. The app provides tailored assessments, insightful scoring, and AI-powered personalized feedback to guide strategic improvements.",
+  "requestFramePermissions": []
+}
