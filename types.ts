@@ -2,16 +2,26 @@ import { ReactElement } from 'react';
 
 // General
 export type AssessmentType = 'executive' | 'nfp';
-export type NfpUserRole = 'executive' | 'manager';
+export type NfpUserRole = 'executive' | 'manager' | 'program_manager' | 'finance_officer' | 'partnership_coordinator';
+
+// Onboarding
+export interface OnboardingData {
+  country: string;
+  profession: string;
+  areaOfFocus: string;
+  yearsOfExperience: string;
+}
 
 // For Executive Assessment
-export type ExecutiveUserRole = 'csuite' | 'senior_leader';
+export type ExecutiveUserRole = 'csuite' | 'senior_leader' | 'chief_risk_officer' | 'head_of_compliance' | 'internal_audit_director';
 
 export interface ExecutiveQuestion {
   id: number;
   category: string;
   question: string;
   role?: 'csuite';
+  industry?: string | string[];
+  country?: string;
 }
 
 export interface ExecutiveAnswer {
@@ -25,6 +35,7 @@ export interface ExecutiveResult {
   level: 'Initial' | 'Managed' | 'Defined' | 'Quantitatively Managed' | 'Optimized' | 'Unknown';
   interpretation: string;
   categoryScores: { [category: string]: number };
+  categoryMaxScores: { [category: string]: number };
 }
 
 // For NFP Assessment
@@ -37,7 +48,9 @@ export interface NfpElement {
 export interface NfpCategory {
   id: string;
   title: string;
+  description?: string;
   elements: NfpElement[];
+  country?: string;
 }
 
 export interface NfpAnswers {

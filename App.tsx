@@ -6,22 +6,22 @@ import NfpAssessment from './components/NfpAssessment';
 import { AssessmentType } from './types';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<AssessmentType | 'home'>('home');
+  const [currentPage, setCurrentPage] = useState<{ type: AssessmentType | 'home'; subType?: string }>({ type: 'home' });
 
-  const handleSelectAssessment = useCallback((type: AssessmentType) => {
-    setCurrentPage(type);
+  const handleSelectAssessment = useCallback((type: AssessmentType, subType?: string) => {
+    setCurrentPage({ type, subType });
   }, []);
 
   const handleGoHome = useCallback(() => {
-    setCurrentPage('home');
+    setCurrentPage({ type: 'home' });
   }, []);
 
   const renderPage = () => {
-    switch (currentPage) {
+    switch (currentPage.type) {
       case 'executive':
-        return <ExecutiveAssessment onGoHome={handleGoHome} />;
+        return <ExecutiveAssessment onGoHome={handleGoHome} subType={currentPage.subType} />;
       case 'nfp':
-        return <NfpAssessment onGoHome={handleGoHome} />;
+        return <NfpAssessment onGoHome={handleGoHome} subType={currentPage.subType} />;
       case 'home':
       default:
         return <HomePage onSelectAssessment={handleSelectAssessment} />;

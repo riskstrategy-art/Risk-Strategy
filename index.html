@@ -15,11 +15,32 @@
       h1, h2, h3, h4, h5, h6 {
         font-family: 'Poppins', sans-serif;
       }
+      @keyframes subtle-bounce {
+        0%, 100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-3px);
+        }
+      }
+      .save-confirmed-animation {
+          animation: subtle-bounce 0.5s ease-in-out;
+      }
+      @keyframes fade-in-out-toast {
+        0% { opacity: 0; transform: translateY(10px); }
+        15% { opacity: 1; transform: translateY(0); }
+        85% { opacity: 1; transform: translateY(0); }
+        100% { opacity: 0; transform: translateY(-10px); }
+      }
+      .save-toast-animation {
+          animation: fade-in-out-toast 2s ease-in-out forwards;
+      }
       @media print {
         body {
           background-color: #fff;
           margin: 0;
           padding: 0;
+          font-size: 10pt;
         }
         main {
           padding: 0 !important;
@@ -40,6 +61,17 @@
           width: 100% !important;
           height: auto !important;
         }
+        .results-view {
+          display: none !important;
+        }
+        .printable-summary {
+          display: block !important;
+        }
+        .printable-summary section {
+          page-break-inside: avoid;
+        }
+        h1 { font-size: 24pt; }
+        h2 { font-size: 16pt; }
       }
     </style>
   <script type="importmap">

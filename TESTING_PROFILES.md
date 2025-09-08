@@ -13,12 +13,12 @@ Here are four user profiles designed to guide preview user testing. These person
 *   **Risk Perspective:** Views risk management not just as a compliance checkbox but as a potential strategic advantage. She is most concerned with emerging risks like cybersecurity, AI disruption, talent retention, and reputational damage.
 *   **Goals for the App:**
     *   To get a very quick, high-level snapshot of where her company stands without getting bogged down in jargon.
-    *   To see if the AI-generated advice offers genuinely insightful, forward-looking strategies beyond generic best practices.
+    *   To see if the generated advice offers genuinely insightful, forward-looking strategies beyond generic best practices.
     *   She will likely use the **Executive Assessment**.
 *   **Testing Focus:**
     *   Does the app feel fast, intuitive, and respectful of her limited time?
     *   Is the language and tone appropriate for a C-suite executive?
-    *   Are the results and AI guidance actionable and strategically relevant?
+    *   Are the results and strategic guidance actionable and strategically relevant?
     *   How does it look and feel on her high-end smartphone?
 
 ---
@@ -59,7 +59,7 @@ Here are four user profiles designed to guide preview user testing. These person
     *   Do the assessment categories and elements resonate with the real-world challenges of managing an NFP?
     *   Is the detailed breakdown of scores by category useful?
     *   Do the comparative benchmark charts provide meaningful context?
-    *   Is the AI guidance tailored to the NFP sector, considering resource constraints and a mission-first focus?
+    *   Is the strategic guidance tailored to the NFP sector, considering resource constraints and a mission-first focus?
 
 ---
 
