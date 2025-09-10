@@ -112,10 +112,14 @@ const HybridNgoIcon = () => (
 
 const ExecutiveIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>;
 const ManagerIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.125-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.125-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>;
-const ProgramManagerIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 17v2a1 1 0 001 1h4a1 1 0 001-1v-2m-6 0a2 2 0 002 2h2a2 2 0 002-2m-6 0V5a2 2 0 012-2h2a2 2 0 012 2v12m-6 0h6" /></svg>;
 const FinanceOfficerIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V6m0 12v-2m0 0a2 2 0 100 4 2 2 0 000-4z" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 18.5A6.5 6.5 0 1012 5.5a6.5 6.5 0 000 13z" /></svg>;
-const PartnershipCoordinatorIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /><path d="M19 12h2a1 1 0 011 1v4a1 1 0 01-1 1h-2" /><path d="M5 12H3a1 1 0 00-1 1v4a1 1 0 001 1h2" /></svg>;
-
+const SeniorLeaderIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.125-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.125-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>;
+const ProgramManagerIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 14l2 2 4-4" />
+    </svg>
+);
 
 const CheckIconWhite = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -153,12 +157,12 @@ const TooltipIcon: React.FC<{ text: string }> = ({ text }) => (
     </div>
 );
 
-const ROLES: { id: NfpUserRole; title: string; description: string; icon: JSX.Element; level: 'executive' | 'manager' }[] = [
-    { id: 'executive', title: 'Executive / Board Member', description: 'Oversees organizational strategy and governance.', icon: <ExecutiveIcon />, level: 'executive'},
-    { id: 'manager', title: 'Manager / Staff', description: 'Handles day-to-day operations and team leadership.', icon: <ManagerIcon />, level: 'manager' },
-    { id: 'program_manager', title: 'Program Manager', description: 'Manages specific projects and their outcomes.', icon: <ProgramManagerIcon />, level: 'manager' },
-    { id: 'finance_officer', title: 'Finance Officer', description: 'Responsible for financial management and reporting.', icon: <FinanceOfficerIcon />, level: 'manager' },
-    { id: 'partnership_coordinator', title: 'Partnership Coordinator', description: 'Manages relationships with partner organizations.', icon: <PartnershipCoordinatorIcon />, level: 'manager' }
+const ROLES: { id: NfpUserRole; title: string; description: string; icon: JSX.Element; level: 'executive' | 'manager'; tooltip: string; }[] = [
+    { id: 'npo_director', title: 'NPO Director', description: 'Oversees organizational strategy and governance.', icon: <ExecutiveIcon />, level: 'executive', tooltip: "Sees all questions, including strategy, governance, and board-level oversight, providing a comprehensive assessment." },
+    { id: 'board_member', title: 'Board Member', description: 'Provides governance and strategic oversight.', icon: <SeniorLeaderIcon />, level: 'executive', tooltip: "Sees all questions, including strategy, governance, and board-level oversight, reflecting the full scope of fiduciary responsibility." },
+    { id: 'operations_manager', title: 'Operations Manager', description: 'Handles day-to-day operations and team leadership.', icon: <ManagerIcon />, level: 'manager', tooltip: "Sees operational questions relevant to day-to-day management, processes, and systems. Strategic questions are hidden to focus the assessment." },
+    { id: 'program_manager', title: 'Program Manager', description: 'Manages specific projects and beneficiary outcomes.', icon: <ProgramManagerIcon />, level: 'manager', tooltip: "Sees operational questions focused on program delivery, partner accountability, and M&E. Strategic questions are hidden." },
+    { id: 'finance_manager', title: 'Finance Manager', description: 'Responsible for financial management and reporting.', icon: <FinanceOfficerIcon />, level: 'manager', tooltip: "Sees operational questions focused on financial management, grant compliance, and reporting. Strategic questions are hidden." },
 ];
 
 export default function NfpAssessment({ onGoHome, subType }: NfpAssessmentProps) {
@@ -188,6 +192,7 @@ export default function NfpAssessment({ onGoHome, subType }: NfpAssessmentProps)
   const [isLoaded, setIsLoaded] = useState(false);
   const [isSaveConfirmed, setIsSaveConfirmed] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [lastAnswered, setLastAnswered] = useState<{ id: string; answer: boolean } | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -237,6 +242,13 @@ export default function NfpAssessment({ onGoHome, subType }: NfpAssessmentProps)
     
     let baseData = NFP_DATA.filter(c => !c.country || c.country === userCountry);
     
+    // --- NFP Sub-type Filtering Logic ---
+    // The question set is dynamically adjusted based on the selected NFP sub-type to ensure relevance.
+    // - For 'NGO' types, we hide questions specific to professional bodies (Category c9), such as those
+    //   related to membership management or CPD, and prioritize questions on donor compliance and
+    //   programmatic risk (Category c10).
+    // - For 'Association' types, we do the opposite: hiding the thematic NGO questions (c10) and including
+    //   the professional body questions (c9).
     if (selectionState.orgType === 'ngo') {
         baseData = baseData.filter(c => c.id !== 'c9');
     } else if (selectionState.orgType === 'association') {
@@ -244,8 +256,10 @@ export default function NfpAssessment({ onGoHome, subType }: NfpAssessmentProps)
     }
 
     if (selectionState.role === 'executive') {
-        return baseData;
+        return baseData; // Executives see all relevant questions
     }
+
+    // Managers see a filtered set of questions, with executive-level questions removed.
     return baseData.map(category => ({
         ...category,
         elements: category.elements.filter(element => element.role !== 'executive')
@@ -255,7 +269,25 @@ export default function NfpAssessment({ onGoHome, subType }: NfpAssessmentProps)
   const currentCategory = filteredNfpData[currentCategoryIndex];
 
   const handleNfpAnswer = (elementId: string, answer: boolean) => {
-    setAnswers(prev => ({ ...prev, [elementId]: answer }));
+    setLastAnswered({ id: elementId, answer });
+    setTimeout(() => setLastAnswered(null), 1500);
+
+    setAnswers(prev => {
+        const newAnswers = { ...prev, [elementId]: answer };
+
+        // Reset answers of dependent questions if condition is no longer met
+        filteredNfpData.forEach(category => {
+            category.elements.forEach(element => {
+                if (element.dependsOn && element.dependsOn.elementId === elementId && answer !== element.dependsOn.requiredValue) {
+                    if (newAnswers[element.id] !== undefined) {
+                        delete newAnswers[element.id];
+                    }
+                }
+            });
+        });
+
+        return newAnswers;
+    });
   };
 
   const handleNext = () => {
@@ -408,30 +440,51 @@ export default function NfpAssessment({ onGoHome, subType }: NfpAssessmentProps)
             );
         case 'role':
              return (
-                <div className="w-full max-w-5xl mx-auto p-4 md:p-8">
+                <div className="w-full max-w-6xl mx-auto p-4 md:p-8">
                     <div className="flex justify-between items-center mb-6">
                         <h3 className="text-lg font-semibold text-slate-600">{selectionState.orgType === 'ngo' ? 'Step 3 of 3' : 'Step 2 of 2'}</h3>
                         <button onClick={() => setSelectionState(prev => ({...prev, step: prev.orgType === 'ngo' ? 'ngoType' : 'orgType', role: null}))} className="text-sm text-slate-500 hover:text-slate-800">&larr; Back</button>
                     </div>
                     {header("Select Your Role", "To tailor the assessment, please tell us which role best describes your position in the organization.")}
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                       {ROLES.map(role => (
-                            <div key={role.id} className={role.level === 'executive' && role.id === 'executive' ? 'md:col-span-3' : ''}>
-                                <SelectionCard 
-                                    small
-                                    title={
-                                      <div className="flex items-center">
-                                        {role.title}
-                                        {role.id === 'executive' && <TooltipIcon text="Sees all questions, including those related to strategy, governance, and board-level oversight." />}
-                                        {role.id === 'manager' && <TooltipIcon text="Sees questions focused on operational and team-level risk management, with strategic questions hidden." />}
-                                      </div>
-                                    }
-                                    description={role.description}
-                                    onClick={() => setSelectionState(prev => ({...prev, role: role.level as 'executive' | 'manager'}))}
-                                    icon={role.icon}
-                                />
+                    <div className="space-y-12">
+                        <div>
+                            <h3 className="text-2xl font-bold text-slate-800 mb-6 text-center">Executive Director / CEO / CFO</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                                {ROLES.filter(r => r.level === 'executive').map(role => (
+                                    <SelectionCard 
+                                        key={role.id}
+                                        title={
+                                            <div className="flex items-center">
+                                                {role.title}
+                                                <TooltipIcon text={role.tooltip} />
+                                            </div>
+                                        }
+                                        description={role.description}
+                                        onClick={() => setSelectionState(prev => ({...prev, role: role.level as 'executive' | 'manager'}))}
+                                        icon={role.icon}
+                                    />
+                                ))}
                             </div>
-                        ))}
+                        </div>
+                        <div>
+                            <h3 className="text-2xl font-bold text-slate-800 mb-6 text-center">Manager</h3>
+                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                                {ROLES.filter(r => r.level === 'manager').map(role => (
+                                    <SelectionCard 
+                                        key={role.id}
+                                        title={
+                                        <div className="flex items-center">
+                                            {role.title}
+                                            <TooltipIcon text={role.tooltip} />
+                                        </div>
+                                        }
+                                        description={role.description}
+                                        onClick={() => setSelectionState(prev => ({...prev, role: role.level as 'executive' | 'manager'}))}
+                                        icon={role.icon}
+                                    />
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
             );
@@ -458,10 +511,40 @@ export default function NfpAssessment({ onGoHome, subType }: NfpAssessmentProps)
                 {toastMessage}
             </div>
         )}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-blue-600">NFP & NGO Assessment</h2>
-            <button onClick={resetSelection} className="text-sm text-slate-500 hover:text-slate-800">&larr; Change Selection</button>
+             <div className="flex items-center gap-4">
+                <button
+                    onClick={handleManualSave}
+                    disabled={isSaveConfirmed}
+                    className={`py-2 px-4 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center min-w-[110px] ${
+                        isSaveConfirmed
+                        ? 'bg-green-600 text-white save-confirmed-animation'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                >
+                    {isSaveConfirmed ? (
+                        <span className="flex items-center">
+                            <CheckIconWhite />
+                            <span className="ml-2">Saved!</span>
+                        </span>
+                    ) : 'Save Progress' }
+                </button>
+                <button onClick={resetSelection} className="text-sm text-slate-500 hover:text-slate-800">&larr; Change Selection</button>
+            </div>
         </div>
+
+        <div className="mb-8">
+            <div className="flex justify-between items-end mb-1">
+                <span className="text-base font-medium text-blue-700">Category {currentCategoryIndex + 1} of {filteredNfpData.length}: {currentCategory.title}</span>
+                <span className="text-sm font-medium text-blue-700">{Math.round(((currentCategoryIndex + 1) / filteredNfpData.length) * 100)}% Complete</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div className="bg-blue-600 h-2.5 rounded-full" style={{width: `${((currentCategoryIndex + 1) / filteredNfpData.length) * 100}%`, transition: 'width 0.3s ease-in-out'}}></div>
+            </div>
+        </div>
+
+
         <div className="flex flex-col md:flex-row gap-8">
             <aside className="w-full md:w-1/3 lg:w-1/4 md:pr-8 md:border-r md:border-slate-200">
                 <h3 className="text-lg font-bold text-slate-800 mb-4">Categories</h3>
@@ -486,16 +569,6 @@ export default function NfpAssessment({ onGoHome, subType }: NfpAssessmentProps)
             </aside>
 
             <main className="w-full md:w-2/3 lg:w-3/4">
-                <div className="mb-6">
-                    <div className="flex justify-between mb-1">
-                        <span className="text-base font-medium text-blue-700">Category {currentCategoryIndex + 1} of {filteredNfpData.length}</span>
-                        <span className="text-sm font-medium text-blue-700">{Math.round(((currentCategoryIndex + 1) / filteredNfpData.length) * 100)}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                        <div className="bg-blue-600 h-2.5 rounded-full" style={{width: `${((currentCategoryIndex + 1) / filteredNfpData.length) * 100}%`, transition: 'width 0.3s ease-in-out'}}></div>
-                    </div>
-                </div>
-
                 <div className="mb-8">
                     <h3 className="text-3xl font-semibold text-slate-800 mb-2">{currentCategory.title}</h3>
                     {currentCategory.description && (
@@ -504,28 +577,34 @@ export default function NfpAssessment({ onGoHome, subType }: NfpAssessmentProps)
                 </div>
 
                 <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-4">
-                    {currentCategory.elements.map(element => (
-                        <div 
-                            key={element.id}
-                            className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-lg bg-slate-50 border-2 border-slate-200"
-                        >
-                            <p className="flex-grow text-slate-700 mr-4 mb-3 sm:mb-0">{element.text}</p>
-                            <div className="flex-shrink-0 flex items-center gap-2 self-end sm:self-center">
-                              <button
-                                onClick={() => handleNfpAnswer(element.id, true)}
-                                className={`px-4 py-2 text-sm font-semibold rounded-md border-2 transition-colors ${answers[element.id] === true ? 'bg-green-600 text-white border-green-700' : 'bg-white text-green-800 border-slate-300 hover:bg-green-50'}`}
-                              >
-                                Yes
-                              </button>
-                              <button
-                                onClick={() => handleNfpAnswer(element.id, false)}
-                                className={`px-4 py-2 text-sm font-semibold rounded-md border-2 transition-colors ${answers[element.id] === false ? 'bg-red-600 text-white border-red-700' : 'bg-white text-red-800 border-slate-300 hover:bg-red-50'}`}
-                              >
-                                No
-                              </button>
+                    {currentCategory.elements.map(element => {
+                        const isVisible = !element.dependsOn || (answers[element.dependsOn.elementId] === element.dependsOn.requiredValue);
+                        if (!isVisible) {
+                            return null;
+                        }
+                        return (
+                            <div 
+                                key={element.id}
+                                className={`flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-lg bg-slate-50 border-2 border-slate-200 transition-colors ${element.dependsOn ? 'conditional-question-animation' : ''} ${lastAnswered?.id === element.id ? (lastAnswered.answer ? 'highlight-yes-animation' : 'highlight-no-animation') : ''}`}
+                            >
+                                <p className="flex-grow text-slate-700 mr-4 mb-3 sm:mb-0">{element.text}</p>
+                                <div className="flex-shrink-0 flex items-center gap-2 self-end sm:self-center">
+                                  <button
+                                    onClick={() => handleNfpAnswer(element.id, true)}
+                                    className={`px-4 py-2 text-sm font-semibold rounded-md border-2 transition-colors ${answers[element.id] === true ? 'bg-green-600 text-white border-green-700' : 'bg-white text-green-800 border-slate-300 hover:bg-green-50'}`}
+                                  >
+                                    Yes
+                                  </button>
+                                  <button
+                                    onClick={() => handleNfpAnswer(element.id, false)}
+                                    className={`px-4 py-2 text-sm font-semibold rounded-md border-2 transition-colors ${answers[element.id] === false ? 'bg-red-600 text-white border-red-700' : 'bg-white text-red-800 border-slate-300 hover:bg-red-50'}`}
+                                  >
+                                    No
+                                  </button>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
                 
                 <div className="mt-8 flex justify-between items-center">
@@ -536,30 +615,12 @@ export default function NfpAssessment({ onGoHome, subType }: NfpAssessmentProps)
                     >
                         Back
                     </button>
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={handleManualSave}
-                            disabled={isSaveConfirmed}
-                            className={`py-3 px-5 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center min-w-[120px] ${
-                                isSaveConfirmed
-                                ? 'bg-green-600 text-white save-confirmed-animation'
-                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                            }`}
-                        >
-                            {isSaveConfirmed ? (
-                                <span className="flex items-center">
-                                    <CheckIconWhite />
-                                    <span className="ml-2">Saved!</span>
-                                </span>
-                            ) : 'Save Progress' }
-                        </button>
-                        <button
-                            onClick={handleNext}
-                            className="py-3 px-8 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors"
-                        >
-                            {currentCategoryIndex < filteredNfpData.length - 1 ? 'Next Category' : 'View Results'}
-                        </button>
-                    </div>
+                    <button
+                        onClick={handleNext}
+                        className="py-3 px-8 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors"
+                    >
+                        {currentCategoryIndex < filteredNfpData.length - 1 ? 'Next Category' : 'View Results'}
+                    </button>
                 </div>
             </main>
         </div>

@@ -2,7 +2,7 @@ import { ReactElement } from 'react';
 
 // General
 export type AssessmentType = 'executive' | 'nfp';
-export type NfpUserRole = 'executive' | 'manager' | 'program_manager' | 'finance_officer' | 'partnership_coordinator';
+export type NfpUserRole = 'npo_director' | 'board_member' | 'operations_manager' | 'program_manager' | 'finance_manager';
 
 // Onboarding
 export interface OnboardingData {
@@ -22,6 +22,10 @@ export interface ExecutiveQuestion {
   role?: 'csuite';
   industry?: string | string[];
   country?: string;
+  dependsOn?: {
+    questionId: number;
+    requiredValue: boolean; // e.g., show this question if questionId is true
+  };
 }
 
 export interface ExecutiveAnswer {
@@ -43,6 +47,10 @@ export interface NfpElement {
   id: string;
   text: string;
   role?: 'executive';
+  dependsOn?: {
+    elementId: string;
+    requiredValue: boolean; // e.g., show this element if elementId is true
+  };
 }
 
 export interface NfpCategory {

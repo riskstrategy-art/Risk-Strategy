@@ -35,6 +35,51 @@
       .save-toast-animation {
           animation: fade-in-out-toast 2s ease-in-out forwards;
       }
+      @keyframes slide-fade-in {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .conditional-question-animation {
+        animation: slide-fade-in 0.5s ease-out forwards;
+      }
+      @keyframes highlight-yes {
+        0%   { background-color: #dcfce7; border-color: #22c55e; }
+        100% { background-color: #f8fafc; border-color: #e2e8f0; }
+      }
+      .highlight-yes-animation {
+        animation: highlight-yes 1.5s ease-out;
+      }
+      @keyframes highlight-no {
+        0%   { background-color: #fee2e2; border-color: #ef4444; }
+        100% { background-color: #f8fafc; border-color: #e2e8f0; }
+      }
+      .highlight-no-animation {
+        animation: highlight-no 1.5s ease-out;
+      }
+      @keyframes indeterminate-progress {
+        0% { transform: translateX(-50%); }
+        100% { transform: translateX(150%); }
+      }
+      .indeterminate-progress-bar {
+        animation: indeterminate-progress 2s ease-in-out infinite;
+      }
+      @keyframes scroll-left {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+      .scrolling-track {
+        animation: scroll-left 40s linear infinite;
+      }
       @media print {
         body {
           background-color: #fff;

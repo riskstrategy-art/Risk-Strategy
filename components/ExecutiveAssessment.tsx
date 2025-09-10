@@ -208,6 +208,7 @@ export default function ExecutiveAssessment({ onGoHome, subType }: ExecutiveAsse
   const [isLoaded, setIsLoaded] = useState(false);
   const [isSaveConfirmed, setIsSaveConfirmed] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [lastAnswered, setLastAnswered] = useState<{ id: number; answer: boolean } | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -289,7 +290,11 @@ export default function ExecutiveAssessment({ onGoHome, subType }: ExecutiveAsse
     const status: { [category: string]: boolean } = {};
     categories.forEach(category => {
         const questionsInCategory = filteredQuestions.filter(q => q.category === category);
-        status[category] = questionsInCategory.length === 0 || questionsInCategory.every(q => answers[q.id] !== null && answers[q.id] !== undefined);
+        status[category] = questionsInCategory.every(q => {
+             const isVisible = !q.dependsOn || (answers[q.dependsOn.questionId] === q.dependsOn.requiredValue);
+             const isAnswered = answers[q.id] !== null && answers[q.id] !== undefined;
+             return isAnswered || !isVisible;
+        });
     });
     return status;
   }, [categories, filteredQuestions, answers]);
@@ -301,7 +306,23 @@ export default function ExecutiveAssessment({ onGoHome, subType }: ExecutiveAsse
   }, [currentCategory, filteredQuestions]);
   
   const handleAnswer = (questionId: number, answer: boolean) => {
-    setAnswers(prev => ({...prev, [questionId]: answer}));
+    setLastAnswered({ id: questionId, answer });
+    setTimeout(() => setLastAnswered(null), 1500);
+
+    setAnswers(prev => {
+        const newAnswers = {...prev, [questionId]: answer};
+        
+        // Find any questions that depend on this one and reset their answers if the condition is no longer met
+        filteredQuestions.forEach(q => {
+            if (q.dependsOn && q.dependsOn.questionId === questionId && answer !== q.dependsOn.requiredValue) {
+                if (newAnswers[q.id] !== undefined) {
+                    delete newAnswers[q.id];
+                }
+            }
+        });
+
+        return newAnswers;
+    });
   };
 
   const handleNext = () => {
@@ -516,6 +537,7 @@ export default function ExecutiveAssessment({ onGoHome, subType }: ExecutiveAsse
             return <RiskAppetiteStep 
                 onBack={() => setSelectionState(prev => ({...prev, step: 'role', riskAppetite: null}))}
                 onSubmit={(data) => setSelectionState(prev => ({...prev, riskAppetite: data, step: 'assessment'}))}
+                onSkip={() => setSelectionState(prev => ({ ...prev, riskAppetite: null, step: 'assessment' }))}
                 stepNumber={selectionState.sector === 'public' ? 2 : 5}
                 totalSteps={totalSteps}
               />;
@@ -542,10 +564,39 @@ export default function ExecutiveAssessment({ onGoHome, subType }: ExecutiveAsse
                 {toastMessage}
             </div>
         )}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-blue-600">Executive Assessment</h2>
-            <button onClick={resetSelection} className="text-sm text-slate-500 hover:text-slate-800">&larr; Change Selections</button>
+             <div className="flex items-center gap-4">
+                <button
+                    onClick={handleManualSave}
+                    disabled={isSaveConfirmed}
+                    className={`py-2 px-4 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center min-w-[110px] ${
+                        isSaveConfirmed
+                        ? 'bg-green-600 text-white save-confirmed-animation'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                >
+                    {isSaveConfirmed ? (
+                        <span className="flex items-center">
+                            <CheckIconWhite />
+                            <span className="ml-2">Saved!</span>
+                        </span>
+                    ) : 'Save Progress'}
+                </button>
+                <button onClick={resetSelection} className="text-sm text-slate-500 hover:text-slate-800">&larr; Change Selections</button>
+            </div>
         </div>
+        
+        <div className="mb-8">
+            <div className="flex justify-between items-end mb-1">
+                <span className="text-base font-medium text-blue-700">Category {currentCategoryIndex + 1} of {categories.length}: {currentCategory}</span>
+                <span className="text-sm font-medium text-blue-700">{Math.round(((currentCategoryIndex + 1) / categories.length) * 100)}% Complete</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div className="bg-blue-600 h-2.5 rounded-full" style={{width: `${((currentCategoryIndex + 1) / categories.length) * 100}%`, transition: 'width 0.3s ease-in-out'}}></div>
+            </div>
+        </div>
+
         <div className="flex flex-col md:flex-row gap-8">
             <aside className="w-full md:w-1/3 lg:w-1/4 md:pr-8 md:border-r md:border-slate-200">
                 <h3 className="text-lg font-bold text-slate-800 mb-4">Categories</h3>
@@ -571,44 +622,42 @@ export default function ExecutiveAssessment({ onGoHome, subType }: ExecutiveAsse
             </aside>
 
             <main className="w-full md:w-2/3 lg:w-3/4">
-                <div className="mb-6">
-                    <div className="flex justify-between mb-1">
-                        <span className="text-base font-medium text-blue-700">Category {currentCategoryIndex + 1} of {categories.length}</span>
-                        <span className="text-sm font-medium text-blue-700">{Math.round(((currentCategoryIndex + 1) / categories.length) * 100)}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                        <div className="bg-blue-600 h-2.5 rounded-full" style={{width: `${((currentCategoryIndex + 1) / categories.length) * 100}%`, transition: 'width 0.3s ease-in-out'}}></div>
-                    </div>
-                </div>
-
                 <div className="mb-8">
                     <h3 className="text-3xl font-semibold text-slate-800 mb-2">{currentCategory}</h3>
                     <p className="text-slate-600">Please answer the following questions based on your organization's current practices.</p>
                 </div>
 
                 <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-4">
-                    {currentCategoryQuestions.map(question => (
-                        <div 
-                            key={question.id}
-                            className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-lg bg-slate-50 border-2 border-slate-200"
-                        >
-                            <p className="flex-grow text-slate-700 mr-4 mb-3 sm:mb-0">{question.question}</p>
-                            <div className="flex-shrink-0 flex items-center gap-2 self-end sm:self-center">
-                              <button
-                                onClick={() => handleAnswer(question.id, true)}
-                                className={`px-5 py-2 text-sm font-semibold rounded-md border-2 transition-colors ${answers[question.id] === true ? 'bg-green-600 text-white border-green-700' : 'bg-white text-green-800 border-slate-300 hover:bg-green-50'}`}
-                              >
-                                Yes
-                              </button>
-                              <button
-                                onClick={() => handleAnswer(question.id, false)}
-                                className={`px-5 py-2 text-sm font-semibold rounded-md border-2 transition-colors ${answers[question.id] === false ? 'bg-red-600 text-white border-red-700' : 'bg-white text-red-800 border-slate-300 hover:bg-red-50'}`}
-                              >
-                                No
-                              </button>
+                    {currentCategoryQuestions.map(question => {
+                        const isVisible = !question.dependsOn || (answers[question.dependsOn.questionId] === question.dependsOn.requiredValue);
+
+                        if (!isVisible) {
+                            return null;
+                        }
+                        
+                        return (
+                            <div 
+                                key={question.id}
+                                className={`flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-lg bg-slate-50 border-2 border-slate-200 transition-colors ${question.dependsOn ? 'conditional-question-animation' : ''} ${lastAnswered?.id === question.id ? (lastAnswered.answer ? 'highlight-yes-animation' : 'highlight-no-animation') : ''}`}
+                            >
+                                <p className="flex-grow text-slate-700 mr-4 mb-3 sm:mb-0">{question.question}</p>
+                                <div className="flex-shrink-0 flex items-center gap-2 self-end sm:self-center">
+                                  <button
+                                    onClick={() => handleAnswer(question.id, true)}
+                                    className={`px-5 py-2 text-sm font-semibold rounded-md border-2 transition-colors ${answers[question.id] === true ? 'bg-green-600 text-white border-green-700' : 'bg-white text-green-800 border-slate-300 hover:bg-green-50'}`}
+                                  >
+                                    Yes
+                                  </button>
+                                  <button
+                                    onClick={() => handleAnswer(question.id, false)}
+                                    className={`px-5 py-2 text-sm font-semibold rounded-md border-2 transition-colors ${answers[question.id] === false ? 'bg-red-600 text-white border-red-700' : 'bg-white text-red-800 border-slate-300 hover:bg-red-50'}`}
+                                  >
+                                    No
+                                  </button>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
                 
                 <div className="mt-8 flex justify-between items-center">
@@ -619,30 +668,12 @@ export default function ExecutiveAssessment({ onGoHome, subType }: ExecutiveAsse
                     >
                         Back
                     </button>
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={handleManualSave}
-                            disabled={isSaveConfirmed}
-                            className={`py-3 px-5 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center min-w-[120px] ${
-                                isSaveConfirmed
-                                ? 'bg-green-600 text-white save-confirmed-animation'
-                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                            }`}
-                        >
-                            {isSaveConfirmed ? (
-                                <span className="flex items-center">
-                                    <CheckIconWhite />
-                                    <span className="ml-2">Saved!</span>
-                                </span>
-                            ) : 'Save Progress'}
-                        </button>
-                        <button
-                            onClick={handleNext}
-                            className="py-3 px-8 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors"
-                        >
-                            {currentCategoryIndex < categories.length - 1 ? 'Next Category' : 'View Results'}
-                        </button>
-                    </div>
+                    <button
+                        onClick={handleNext}
+                        className="py-3 px-8 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors"
+                    >
+                        {currentCategoryIndex < categories.length - 1 ? 'Next Category' : 'View Results'}
+                    </button>
                 </div>
             </main>
         </div>
@@ -654,9 +685,10 @@ export default function ExecutiveAssessment({ onGoHome, subType }: ExecutiveAsse
 const RiskAppetiteStep: React.FC<{
   onBack: () => void;
   onSubmit: (data: any) => void;
+  onSkip: () => void;
   stepNumber: number;
   totalSteps: number;
-}> = ({ onBack, onSubmit, stepNumber, totalSteps }) => {
+}> = ({ onBack, onSubmit, onSkip, stepNumber, totalSteps }) => {
     const [data, setData] = useState({ exists: '', documented: '', aligned: '' });
 
     const isComplete = data.exists && data.documented && data.aligned;
@@ -713,9 +745,12 @@ const RiskAppetiteStep: React.FC<{
                     </div>
                 </div>
 
-                <div className="pt-4">
+                <div className="pt-4 space-y-3">
                     <button type="submit" disabled={!isComplete} className="w-full py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                         Proceed to Assessment
+                    </button>
+                    <button type="button" onClick={onSkip} className="w-full py-2 px-6 bg-transparent text-slate-600 font-semibold rounded-lg hover:bg-slate-100 transition-colors">
+                        Skip this step
                     </button>
                 </div>
             </form>

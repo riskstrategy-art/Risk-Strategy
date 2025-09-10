@@ -22,6 +22,20 @@ const getCountryContext = (country?: string): string => {
             return `Your advice should be mindful of Canada's privacy laws, including the federal PIPEDA and stricter provincial acts like Quebec's Law 25. Key considerations include consent management under CASL, mandatory breach reporting, and robust whistleblower protections as outlined in the Competition Act.`;
         case 'Australia':
             return `Your advice should be mindful of Australia's regulatory framework, particularly the Privacy Act and its Australian Privacy Principles (APPs). Key areas of focus include mandatory data breach notification to the OAIC, and ensuring the corporate whistleblower policy is effective and compliant with the Corporations Act.`;
+        case 'Zimbabwe':
+            return `Your advice should be mindful of Zimbabwe's Data Protection Act, 2021 (DPA). Key considerations include mandatory registration with the regulator (POTRAZ), strict requirements for data breach notifications, processes for handling data subject rights (access, erasure), and the need for a Data Protection Officer (DPO) for certain entities.`;
+        case 'Angola':
+            return `Your advice should be mindful of Angola's Law no. 22/11 on the Protection of Personal Data. Key considerations include mandatory registration with the Data Protection Agency (APD), strict rules for cross-border data transfers, and obtaining explicit consent for data processing.`;
+        case 'Botswana':
+            return `Your advice should be mindful of Botswana's Data Protection Act, 2018. Key considerations include mandatory registration with the Information and Data Protection Commission, the appointment of a Data Protection Officer (DPO), and adhering to defined procedures for data breach notifications.`;
+        case 'Mauritius':
+            return `Your advice should be mindful of the Mauritius Data Protection Act 2017, which is closely aligned with GDPR. Emphasize the need for a Data Protection Officer (DPO), conducting Data Protection Impact Assessments (DPIAs) for high-risk activities, and strict 72-hour data breach notification rules.`;
+        case 'Mozambique':
+            return `Your advice should be mindful of Mozambique's data protection landscape. While a comprehensive single law is emerging, focus on core principles from its Constitution and Electronic Transactions Law, such as the necessity of explicit consent for data processing and implementing robust security measures.`;
+        case 'Tanzania':
+            return `Your advice should be mindful of Tanzania's Personal Data Protection Act, 2022. Key considerations include the mandatory registration of data controllers and processors with the Personal Data Protection Commission and adherence to rules on cross-border data transfers.`;
+        case 'Zambia':
+            return `Your advice should be mindful of Zambia's Data Protection Act No. 3 of 2021. Key considerations include the mandatory registration of all controllers and processors with the Data Protection Commissioner's office and the appointment of a Data Protection Officer.`;
         default:
             return `Your advice should emphasize general best practices in governance, as the specific country context is not provided.`;
     }

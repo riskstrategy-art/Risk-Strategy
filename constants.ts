@@ -62,6 +62,13 @@ export const EXECUTIVE_QUESTIONS: ExecutiveQuestion[] = [
     role: 'csuite',
   },
   {
+    id: 84,
+    category: 'Governance & Culture',
+    question: 'Is this Risk Appetite Statement reviewed and updated at least annually to reflect changes in your strategic objectives or external environment?',
+    role: 'csuite',
+    dependsOn: { questionId: 2, requiredValue: true },
+  },
+  {
     id: 3,
     category: 'Process & Framework',
     question: 'When evaluating a major new project or investment, is a formal risk assessment integrated into the business case and challenged by leadership?',
@@ -459,6 +466,210 @@ export const EXECUTIVE_QUESTIONS: ExecutiveQuestion[] = [
     question: "Does your organization's whistleblower policy, as required by the Corporations Act, provide clear and accessible pathways for disclosure and robust protections against detriment for all employees and officers?",
     country: 'Australia',
     role: 'csuite'
+  },
+  {
+    id: 68,
+    category: 'Data Protection & Whistleblowing',
+    question: "Is your organization fully compliant with Zimbabwe's Data Protection Act, 2021, including formal registration with the Postal and Telecommunications Regulatory Authority of Zimbabwe (POTRAZ)?",
+    role: 'csuite',
+    country: 'Zimbabwe'
+  },
+  {
+    id: 69,
+    category: 'Data Protection & Whistleblowing',
+    question: "Does your organization have a formal, tested process for notifying POTRAZ of a data breach, as mandated by the Data Protection Act?",
+    role: 'csuite',
+    country: 'Zimbabwe'
+  },
+  {
+    id: 70,
+    category: 'Data Protection & Whistleblowing',
+    question: "Are there established procedures within your organization to handle data subject requests, such as the right to access, rectify, or erase personal data, in accordance with the DPA?",
+    country: 'Zimbabwe'
+  },
+  {
+    id: 71,
+    category: 'Data Protection & Whistleblowing',
+    question: "Has your organization appointed a Data Protection Officer (DPO) and implemented a process for conducting Data Protection Impact Assessments (DPIAs) for high-risk data processing activities?",
+    country: 'Zimbabwe'
+  },
+  {
+    id: 72,
+    category: 'Data Protection & Whistleblowing',
+    question: "Is your organization registered with the Angolan Data Protection Agency (APD) for all personal data processing activities as required by Law no. 22/11?",
+    country: 'Angola',
+    role: 'csuite'
+  },
+  {
+    id: 73,
+    category: 'Data Protection & Whistleblowing',
+    question: "Does your organization have a formal process to obtain prior authorization from the APD before transferring personal data to countries without an adequate level of data protection?",
+    country: 'Angola'
+  },
+  {
+    id: 74,
+    category: 'Data Protection & Whistleblowing',
+    question: "Has your organization registered its data processing operations with Botswana's Information and Data Protection Commission as required by the Data Protection Act, 2018?",
+    country: 'Botswana',
+    role: 'csuite'
+  },
+  {
+    id: 75,
+    category: 'Data Protection & Whistleblowing',
+    question: "Have you appointed a Data Protection Officer (DPO) and are their details registered with the Commission in Botswana?",
+    country: 'Botswana'
+  },
+  {
+    id: 76,
+    category: 'Data Protection & Whistleblowing',
+    question: "Is your organization registered with the Data Protection Office in Mauritius as a controller or processor under the Data Protection Act 2017?",
+    country: 'Mauritius',
+    role: 'csuite'
+  },
+  {
+    id: 77,
+    category: 'Data Protection & Whistleblowing',
+    question: "Does your organization have a formal process for conducting Data Protection Impact Assessments (DPIAs) for high-risk processing, as required by the Mauritius DPA?",
+    country: 'Mauritius'
+  },
+  {
+    id: 78,
+    category: 'Data Protection & Whistleblowing',
+    question: "Does your organization have a formal process to obtain explicit and informed consent before processing any personal data in Mozambique?",
+    country: 'Mozambique'
+  },
+  {
+    id: 79,
+    category: 'Data Protection & Whistleblowing',
+    question: "Are your data security measures aligned with best practices, considering Mozambique's legal emphasis on preventing unauthorized access and data loss?",
+    country: 'Mozambique'
+  },
+  {
+    id: 80,
+    category: 'Data Protection & Whistleblowing',
+    question: "Has your organization registered with the Personal Data Protection Commission in Tanzania as a data controller or processor, as mandated by the Personal Data Protection Act, 2022?",
+    country: 'Tanzania',
+    role: 'csuite'
+  },
+  {
+    id: 81,
+    category: 'Data Protection & Whistleblowing',
+    question: "Is there a formal process in place to manage cross-border data transfers from Tanzania, ensuring compliance with the requirements set by the Commission?",
+    country: 'Tanzania'
+  },
+  {
+    id: 82,
+    category: 'Data Protection & Whistleblowing',
+    question: "Is your organization registered with the Data Protection Commissioner in Zambia as required by the Data Protection Act No. 3 of 2021?",
+    country: 'Zambia',
+    role: 'csuite'
+  },
+  {
+    id: 83,
+    category: 'Data Protection & Whistleblowing',
+    question: "Have you appointed and registered a Data Protection Officer with the Commissioner's office in Zambia?",
+    country: 'Zambia'
+  },
+  {
+    id: 85,
+    category: 'Process & Framework',
+    question: "Does your organization have a formal process for analyzing customer data to personalize marketing and enhance the omnichannel (online & in-store) experience?",
+    industry: 'Retail'
+  },
+  {
+    id: 86,
+    category: 'Third-Party Risk',
+    question: "Is there a formal risk assessment process for your last-mile delivery partners to ensure service quality and brand reputation?",
+    industry: 'Retail'
+  },
+  {
+    id: 87,
+    category: 'Integration',
+    question: "Is the transition to renewable energy sources a formally integrated part of your long-term strategic planning and capital allocation process?",
+    industry: 'Energy',
+    role: 'csuite'
+  },
+  {
+    id: 88,
+    category: 'Technology & Cybersecurity',
+    question: "Does your risk management framework include specific assessments for the cybersecurity vulnerabilities of smart grid technologies and decentralized energy systems?",
+    industry: 'Energy'
+  },
+  {
+    id: 89,
+    category: 'Talent & Culture',
+    question: "Does your organization have a strategic plan to manage the risks associated with talent shortages for specialized medical staff, including proactive retention and recruitment initiatives?",
+    industry: 'Health'
+  },
+  {
+    id: 90,
+    category: 'Technology & Cybersecurity',
+    question: "Is there a formal risk assessment and governance process in place for the adoption of telehealth services and AI-powered diagnostic tools?",
+    industry: 'Health'
+  },
+  {
+    id: 91,
+    category: 'Process & Framework',
+    question: "Does your organization utilize technologies like Building Information Modeling (BIM) to proactively identify and mitigate project risks during the design and planning phases?",
+    industry: 'Construction'
+  },
+  {
+    id: 92,
+    category: 'ESG & Reputational Risk',
+    question: "Is adherence to sustainable and green building practices (e.g., LEED) a formal consideration in your project selection and risk management framework?",
+    industry: 'Construction'
+  },
+  {
+    id: 93,
+    category: 'Integration',
+    question: "Does your strategic planning process formally assess the risks and opportunities of expanding into value-added services like cloud computing, IoT, and cybersecurity?",
+    industry: 'Telecoms',
+    role: 'csuite'
+  },
+  {
+    id: 94,
+    category: 'Risk Response',
+    question: "Is there a formal risk management process to address the financial and operational risks associated with high capital expenditure for 5G and fiber infrastructure rollouts?",
+    industry: 'Telecoms'
+  },
+  {
+    id: 95,
+    category: 'Governance & Culture',
+    question: "Does your organization have a formal framework to build and maintain customer trust, including transparent data usage policies and robust security protocols?",
+    industry: 'Fintech'
+  },
+  {
+    id: 96,
+    category: 'Scenario Planning and Future-Proofing',
+    question: "Is the potential disruption and opportunity of blockchain technology and decentralized finance (DeFi) formally considered in your long-term strategic risk assessments?",
+    industry: 'Fintech',
+    role: 'csuite'
+  },
+  {
+    id: 97,
+    category: 'Scenario Planning and Future-Proofing',
+    question: "Does your portfolio risk assessment model the long-term impact of changing work patterns (e.g., remote/hybrid work) on demand for commercial office space?",
+    industry: 'Real Estate',
+    role: 'csuite'
+  },
+  {
+    id: 98,
+    category: 'Technology & Cybersecurity',
+    question: "Does your organization have a process to evaluate and manage the risks associated with adopting 'proptech' solutions for property management and tenant services?",
+    industry: 'Real Estate'
+  },
+  {
+    id: 99,
+    category: 'Scenario Planning and Future-Proofing',
+    question: "Is there a formal process to continuously scan for, assess, and adapt to the risk of technological obsolescence in your core products and services?",
+    industry: 'ICT',
+    role: 'csuite'
+  },
+  {
+    id: 100,
+    category: 'Talent & Culture',
+    question: "Does your organization have a proactive strategy to mitigate the risks of global talent shortages for specialized skills like AI and cybersecurity?",
+    industry: 'ICT'
   }
 ];
 
@@ -591,7 +802,8 @@ export const NFP_DATA: NfpCategory[] = [
         { id: '4.2', text: "The board of directors has formally concurred with the organization's risk appetite statement.", role: 'executive' },
         { id: '4.3', text: "The organization has separately defined its risk appetite for different types of NFP-specific risks (e.g., different appetites for programmatic risk in high-conflict zones versus financial risk, or for integrity risks like fraud and SHEA).", role: 'executive' },
         { id: '4.4', text: "The organization has expressed in writing its overall appetite for risk-taking, even if it is a general guide rather than a strict quantitative measure.", role: 'executive' },
-        { id: '4.5', text: "The organization has used at least some quantitative or qualitative measures and boundaries (e.g., acceptable financial loss, number of language speakers in a new country, level of security risk tolerated for staff/partners) in defining its risk appetite.", role: 'executive' }
+        { id: '4.5', text: "The organization has used at least some quantitative or qualitative measures and boundaries (e.g., acceptable financial loss, number of language speakers in a new country, level of security risk tolerated for staff/partners) in defining its risk appetite.", role: 'executive' },
+        { id: '4.6', text: "Is this written statement regularly communicated to program managers and field staff to guide operational decisions?", role: 'executive', dependsOn: { elementId: '4.4', requiredValue: true } }
     ]
   },
   {
@@ -697,7 +909,7 @@ export const NFP_DATA: NfpCategory[] = [
         { id: '11.3', text: "Is there a formal procedure to report any changes to your constitution, physical address, or office bearers to the Directorate within one month of the change?", role: 'executive' },
         { id: '11.4', text: "If your NPO operates or makes donations internationally, have you completed the compulsory registration as required by the GLA Act?", role: 'executive' },
         { id: '11.5', text: "Does your organization maintain up-to-date, prescribed information about its governing structures as required by the NPO Act?" },
-        { id: '11.6', text: "Is your organization aware of the consequences of non-compliance, including de-registration and the criminal offense of misrepresenting registration status?", role: 'executive'}
+        { id: '11.6', text: "Is your organization aware of the consequences of non-compliance, including de-registration, and the criminal offense of misrepresenting registration status?", role: 'executive'}
     ]
   },
   {

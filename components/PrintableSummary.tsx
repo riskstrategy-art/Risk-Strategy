@@ -51,6 +51,49 @@ const renderNfpBreakdown = (result: NfpResult) => (
     </table>
 );
 
+const markdownToPrintableHtml = (markdown: string): string => {
+    if (!markdown) return '';
+    const lines = markdown.split('\n');
+    let html = '';
+    let listType: 'ul' | 'ol' | null = null;
+
+    const closeList = () => {
+        if (listType) {
+            html += listType === 'ul' ? '</ul>' : '</ol>';
+            listType = null;
+        }
+    };
+
+    for (const line of lines) {
+        if (line.startsWith('### ')) {
+            closeList();
+            html += `<h3 class="text-base font-bold text-slate-800 mt-3 mb-1">${line.substring(4)}</h3>`;
+        } else if (line.startsWith('* ')) {
+            if (listType !== 'ul') {
+                closeList();
+                html += '<ul style="list-style-type: disc; padding-left: 20px;">';
+                listType = 'ul';
+            }
+            html += `<li>${line.substring(2)}</li>`;
+        } else if (/^\d+\.\s/.test(line)) {
+            if (listType !== 'ol') {
+                closeList();
+                html += '<ol style="list-style-type: decimal; padding-left: 20px;">';
+                listType = 'ol';
+            }
+            html += `<li>${line.replace(/^\d+\.\s/, '')}</li>`;
+        } else if (line.trim() !== '') {
+            closeList();
+            html += `<p style="margin-top: 4px;">${line}</p>`;
+        } else {
+            closeList();
+        }
+    }
+
+    closeList();
+    return html;
+};
+
 
 export default function PrintableSummary({ result, assessmentType, guidance }: PrintableSummaryProps) {
     const currentDate = new Date().toLocaleDateString('en-GB', {
@@ -91,7 +134,7 @@ export default function PrintableSummary({ result, assessmentType, guidance }: P
 
             <section className="mb-8">
                 <h2 className="text-xl font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2">Customized Strategic Guidance</h2>
-                 <div className="whitespace-pre-wrap text-slate-700 text-sm leading-relaxed prose prose-sm max-w-none" dangerouslySetInnerHTML={{__html: guidance.replace(/### (.*)/g, '<h3 class="text-base font-bold text-slate-800 mt-3 mb-1">$1</h3>').replace(/\* (.*)/g, '<li class="ml-4">$1</li>').replace(/(\d)\. (.*)/g, '<li class="ml-4">$1. $2</li>') }}></div>
+                 <div className="text-slate-700 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: markdownToPrintableHtml(guidance) }}></div>
             </section>
 
             <section>
