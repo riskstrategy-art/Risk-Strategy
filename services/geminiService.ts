@@ -2,6 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import { ExecutiveResult, NfpResult, AssessmentType } from '../types';
 
 let ai: GoogleGenAI | null = null;
+// FIX: Use process.env.API_KEY for the API key as per guidelines.
 if (process.env.API_KEY) {
   ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 }

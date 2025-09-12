@@ -1,15 +1,14 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { EXECUTIVE_QUESTIONS, EXECUTIVE_SCORE_RANGES, OPERATING_COUNTRIES, PROFESSIONAL_BODIES, AREAS_OF_FOCUS, YEARS_OF_EXPERIENCE } from '../constants';
+import { EXECUTIVE_QUESTIONS, EXECUTIVE_SCORE_RANGES, OPERATING_COUNTRIES, PROFESSIONAL_BODIES, AREAS_OF_FOCUS, YEARS_OF_EXPERIENCE, INDUSTRY_SPECIFIC_INSIGHTS } from '../constants';
 import { ExecutiveResult, ExecutiveUserRole, ExecutiveQuestion, OnboardingData } from '../types';
 import ResultsPage from './ResultsPage';
 import Spinner from './Spinner';
+import { saveAssessmentProgress, loadAssessmentProgress, clearAssessmentProgress } from '../services/assessmentService';
 
 interface ExecutiveAssessmentProps {
   onGoHome: () => void;
   subType?: string;
 }
-
-const EXECUTIVE_STORAGE_KEY = 'executiveAssessmentProgress';
 
 // --- Onboarding Sub-Component ---
 const OnboardingDetails: React.FC<{ onSubmit: (data: OnboardingData) => void; onGoHome: () => void; }> = ({ onSubmit, onGoHome }) => {
@@ -188,9 +187,8 @@ export default function ExecutiveAssessment({ onGoHome, subType }: ExecutiveAsse
     otherIndustryDescription: string;
     role: ExecutiveUserRole | null;
     riskAppetite: {
-        exists: 'yes' | 'no' | 'developing' | null;
-        documented: 'formal' | 'informal' | 'none' | null;
-        aligned: 'full' | 'partial' | 'none' | null;
+        statementStatus: string;
+        influences: string;
     } | null;
   }>({
     step: subType === 'public' ? 'role' : 'sector',
@@ -211,45 +209,54 @@ export default function ExecutiveAssessment({ onGoHome, subType }: ExecutiveAsse
   const [lastAnswered, setLastAnswered] = useState<{ id: number; answer: boolean } | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      try {
-        const savedProgress = localStorage.getItem(EXECUTIVE_STORAGE_KEY);
-        if (savedProgress) {
-          const { selectionState: savedState, answers: savedAnswers, currentCategoryIndex: savedIndex, onboardingData: savedOnboarding } = JSON.parse(savedProgress);
-          if (savedState && savedState.role && savedAnswers && typeof savedIndex === 'number' && savedOnboarding) {
-            setSelectionState(savedState);
-            setAnswers(savedAnswers);
-            setCurrentCategoryIndex(savedIndex);
-            setOnboardingData(savedOnboarding);
-            setToastMessage('Your progress has been restored!');
-            setTimeout(() => setToastMessage(''), 2000);
-          }
+    let isMounted = true;
+    const loadProgress = async () => {
+        try {
+            const savedProgress = await loadAssessmentProgress('executive');
+            if (isMounted && savedProgress) {
+                const { selectionState: savedState, answers: savedAnswers, currentCategoryIndex: savedIndex, onboardingData: savedOnboarding } = savedProgress;
+                if (savedState && savedState.role && savedAnswers && typeof savedIndex === 'number' && savedOnboarding) {
+                    setSelectionState(savedState);
+                    setAnswers(savedAnswers);
+                    setCurrentCategoryIndex(savedIndex);
+                    setOnboardingData(savedOnboarding);
+                    setToastMessage('Your progress has been restored!');
+                    setTimeout(() => setToastMessage(''), 2000);
+                }
+            }
+        } catch (error) {
+            console.error("Failed to load Executive assessment progress:", error);
+            clearAssessmentProgress('executive');
+        } finally {
+            if (isMounted) {
+                setIsLoaded(true);
+            }
         }
-      } catch (error) {
-        console.error("Failed to load Executive assessment progress:", error);
-        localStorage.removeItem(EXECUTIVE_STORAGE_KEY);
-      } finally {
-        setIsLoaded(true);
-      }
+    };
+
+    const timer = setTimeout(() => {
+        loadProgress();
     }, 500);
 
-    return () => clearTimeout(timer);
+    return () => {
+        isMounted = false;
+        clearTimeout(timer);
+    };
   }, []);
 
-  const saveProgress = () => {
-    if (isLoaded && selectionState.step === 'assessment' && !showResults) {
-      try {
-        const progress = { selectionState, answers, currentCategoryIndex, onboardingData };
-        localStorage.setItem(EXECUTIVE_STORAGE_KEY, JSON.stringify(progress));
-      } catch (error) {
-        console.error("Failed to save Executive assessment progress:", error);
-      }
-    }
-  };
-
   useEffect(() => {
-    saveProgress();
-  }, [selectionState, answers, currentCategoryIndex, isLoaded, showResults, onboardingData]);
+    // Debounced save to avoid excessive writes/API calls
+    const handler = setTimeout(() => {
+        if (isLoaded && selectionState.step === 'assessment' && !showResults) {
+            const progress = { selectionState, answers, currentCategoryIndex, onboardingData };
+            saveAssessmentProgress('executive', progress);
+        }
+    }, 500);
+
+    return () => {
+        clearTimeout(handler);
+    };
+  }, [selectionState, answers, currentCategoryIndex, onboardingData, isLoaded, showResults]);
   
   const filteredQuestions = useMemo<ExecutiveQuestion[]>(() => {
     if (!selectionState.role || !onboardingData) return [];
@@ -330,7 +337,7 @@ export default function ExecutiveAssessment({ onGoHome, subType }: ExecutiveAsse
       setCurrentCategoryIndex(currentCategoryIndex + 1);
     } else {
       setShowResults(true);
-      localStorage.removeItem(EXECUTIVE_STORAGE_KEY);
+      clearAssessmentProgress('executive');
     }
   };
 
@@ -339,13 +346,17 @@ export default function ExecutiveAssessment({ onGoHome, subType }: ExecutiveAsse
   };
 
   const handleManualSave = () => {
-    saveProgress();
-    setIsSaveConfirmed(true);
-    setTimeout(() => setIsSaveConfirmed(false), 2000);
+    if (isLoaded && selectionState.step === 'assessment' && !showResults) {
+        const progress = { selectionState, answers, currentCategoryIndex, onboardingData };
+        saveAssessmentProgress('executive', progress).then(() => {
+            setIsSaveConfirmed(true);
+            setTimeout(() => setIsSaveConfirmed(false), 2000);
+        });
+    }
   };
   
   const resetSelection = () => {
-      localStorage.removeItem(EXECUTIVE_STORAGE_KEY);
+      clearAssessmentProgress('executive');
       setOnboardingData(null);
       setSelectionState({
         step: 'sector',
@@ -412,6 +423,10 @@ export default function ExecutiveAssessment({ onGoHome, subType }: ExecutiveAsse
     
     return { totalScore, maxScore, level: calculatedLevel, interpretation: calculatedInterpretation, categoryScores, categoryMaxScores };
   }, [showResults, answers, filteredQuestions, categories]);
+
+  const industryInsights = useMemo(() => {
+    return selectionState.industry ? INDUSTRY_SPECIFIC_INSIGHTS[selectionState.industry] : null;
+  }, [selectionState.industry]);
 
   if (!isLoaded) {
     return <div className="w-full max-w-4xl mx-auto p-4 md:p-8 flex justify-center items-center min-h-[400px]"><Spinner /></div>;
@@ -536,8 +551,19 @@ export default function ExecutiveAssessment({ onGoHome, subType }: ExecutiveAsse
         case 'riskAppetite':
             return <RiskAppetiteStep 
                 onBack={() => setSelectionState(prev => ({...prev, step: 'role', riskAppetite: null}))}
-                onSubmit={(data) => setSelectionState(prev => ({...prev, riskAppetite: data, step: 'assessment'}))}
-                onSkip={() => setSelectionState(prev => ({ ...prev, riskAppetite: null, step: 'assessment' }))}
+                onSubmit={(data) => {
+                    const q2Answer = data.statementStatus === 'approved';
+                    const q142Answer = q2Answer && data.influences === 'systematically';
+                    const q143Answer = data.statementStatus === 'developing';
+
+                    setAnswers(prev => ({
+                      ...prev,
+                      2: q2Answer,
+                      142: q142Answer,
+                      143: q143Answer
+                    }));
+                    setSelectionState(prev => ({ ...prev, riskAppetite: data, step: 'assessment' }));
+                }}
                 stepNumber={selectionState.sector === 'public' ? 2 : 5}
                 totalSteps={totalSteps}
               />;
@@ -608,7 +634,7 @@ export default function ExecutiveAssessment({ onGoHome, subType }: ExecutiveAsse
                                     onClick={() => setCurrentCategoryIndex(index)}
                                     className={`w-full text-left p-3 rounded-lg text-sm transition-colors flex justify-between items-center ${
                                       index === currentCategoryIndex
-                                        ? 'bg-blue-600 text-white font-semibold shadow'
+                                        ? 'bg-blue-600 text-white font-bold shadow-lg ring-2 ring-blue-400'
                                         : `text-slate-600 hover:bg-slate-100 ${categoryCompletionStatus[category] ? 'font-medium' : ''}`
                                     }`}
                                 >
@@ -619,6 +645,25 @@ export default function ExecutiveAssessment({ onGoHome, subType }: ExecutiveAsse
                         ))}
                     </ul>
                 </nav>
+                {industryInsights && (
+                    <div className="mt-8 pt-4 border-t border-slate-200">
+                        <h4 className="font-bold text-slate-700 text-sm mb-2">Industry Context: {selectionState.industry}</h4>
+                        <div className="space-y-3 text-xs text-slate-600">
+                            <div>
+                                <h5 className="font-semibold text-red-600 mb-1">Key Risks</h5>
+                                <ul className="list-disc pl-4 space-y-1">
+                                    {industryInsights.risks.slice(0, 2).map((risk, i) => <li key={i}>{risk}</li>)}
+                                </ul>
+                            </div>
+                            <div>
+                                <h5 className="font-semibold text-green-600 mb-1">Opportunities</h5>
+                                <ul className="list-disc pl-4 space-y-1">
+                                    {industryInsights.opportunities.slice(0, 2).map((opp, i) => <li key={i}>{opp}</li>)}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </aside>
 
             <main className="w-full md:w-2/3 lg:w-3/4">
@@ -685,13 +730,12 @@ export default function ExecutiveAssessment({ onGoHome, subType }: ExecutiveAsse
 const RiskAppetiteStep: React.FC<{
   onBack: () => void;
   onSubmit: (data: any) => void;
-  onSkip: () => void;
   stepNumber: number;
   totalSteps: number;
-}> = ({ onBack, onSubmit, onSkip, stepNumber, totalSteps }) => {
-    const [data, setData] = useState({ exists: '', documented: '', aligned: '' });
+}> = ({ onBack, onSubmit, stepNumber, totalSteps }) => {
+    const [data, setData] = useState({ statementStatus: '', influences: '' });
 
-    const isComplete = data.exists && data.documented && data.aligned;
+    const isComplete = data.statementStatus && data.influences;
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -701,14 +745,14 @@ const RiskAppetiteStep: React.FC<{
     };
 
     const RadioButton = ({ name, value, label, checked, onChange }: any) => (
-        <label className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${checked ? 'bg-blue-100 border-blue-500 shadow-md' : 'bg-white border-slate-200 hover:bg-slate-50'}`}>
+        <label className={`block p-4 border-2 rounded-lg cursor-pointer transition-all h-full flex items-center ${checked ? 'bg-blue-100 border-blue-500 shadow-md' : 'bg-white border-slate-200 hover:bg-slate-50'}`}>
             <input type="radio" name={name} value={value} checked={checked} onChange={onChange} className="hidden" />
             <span className="font-semibold text-slate-700">{label}</span>
         </label>
     );
 
     return (
-        <div className="w-full max-w-4xl mx-auto p-4 md:p-8">
+        <div className="w-full max-w-5xl mx-auto p-4 md:p-8">
             <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-semibold text-slate-600">Step {stepNumber} of {totalSteps}</h3>
                 <button onClick={onBack} className="text-sm text-slate-500 hover:text-slate-800">&larr; Back</button>
@@ -719,38 +763,27 @@ const RiskAppetiteStep: React.FC<{
             </div>
             <form onSubmit={handleSubmit} className="space-y-8 bg-white p-8 rounded-2xl shadow-xl border border-slate-200">
                 <div>
-                    <h4 className="text-lg font-bold text-slate-800 mb-3">1. Does your organization have a Risk Appetite Statement?</h4>
+                    <h4 className="text-lg font-bold text-slate-800 mb-3">1. Does your organization have a formally documented and board-approved Risk Appetite Statement?</h4>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <RadioButton name="exists" value="yes" label="Yes, it exists" checked={data.exists === 'yes'} onChange={(e: any) => setData(p => ({...p, exists: e.target.value}))} />
-                        <RadioButton name="exists" value="developing" label="It's in development" checked={data.exists === 'developing'} onChange={(e: any) => setData(p => ({...p, exists: e.target.value}))} />
-                        <RadioButton name="exists" value="no" label="No, not at this time" checked={data.exists === 'no'} onChange={(e: any) => setData(p => ({...p, exists: e.target.value}))} />
+                        <RadioButton name="statementStatus" value="approved" label="Yes, approved" checked={data.statementStatus === 'approved'} onChange={(e: any) => setData(p => ({...p, statementStatus: e.target.value}))} />
+                        <RadioButton name="statementStatus" value="developing" label="In development" checked={data.statementStatus === 'developing'} onChange={(e: any) => setData(p => ({...p, statementStatus: e.target.value}))} />
+                        <RadioButton name="statementStatus" value="no" label="No" checked={data.statementStatus === 'no'} onChange={(e: any) => setData(p => ({...p, statementStatus: e.target.value}))} />
                     </div>
                 </div>
 
                 <div>
-                    <h4 className="text-lg font-bold text-slate-800 mb-3">2. How is it documented?</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <RadioButton name="documented" value="formal" label="Formally Documented & Approved" checked={data.documented === 'formal'} onChange={(e: any) => setData(p => ({...p, documented: e.target.value}))} />
-                        <RadioButton name="documented" value="informal" label="Informally Understood" checked={data.documented === 'informal'} onChange={(e: any) => setData(p => ({...p, documented: e.target.value}))} />
-                        <RadioButton name="documented" value="none" label="Not Documented" checked={data.documented === 'none'} onChange={(e: any) => setData(p => ({...p, documented: e.target.value}))} />
-                    </div>
-                </div>
-                
-                <div>
-                    <h4 className="text-lg font-bold text-slate-800 mb-3">3. How well is it aligned with strategic goals?</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <RadioButton name="aligned" value="full" label="Fully Aligned & Guides Decisions" checked={data.aligned === 'full'} onChange={(e: any) => setData(p => ({...p, aligned: e.target.value}))} />
-                        <RadioButton name="aligned" value="partial" label="Partially Aligned" checked={data.aligned === 'partial'} onChange={(e: any) => setData(p => ({...p, aligned: e.target.value}))} />
-                        <RadioButton name="aligned" value="none" label="Not Aligned or Unclear" checked={data.aligned === 'none'} onChange={(e: any) => setData(p => ({...p, aligned: e.target.value}))} />
+                    <h4 className="text-lg font-bold text-slate-800 mb-3">2. To what extent does the Risk Appetite Statement influence key business decisions?</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <RadioButton name="influences" value="systematically" label="Systematically" checked={data.influences === 'systematically'} onChange={(e: any) => setData(p => ({...p, influences: e.target.value}))} />
+                        <RadioButton name="influences" value="sometimes" label="Sometimes" checked={data.influences === 'sometimes'} onChange={(e: any) => setData(p => ({...p, influences: e.target.value}))} />
+                        <RadioButton name="influences" value="rarely" label="Rarely" checked={data.influences === 'rarely'} onChange={(e: any) => setData(p => ({...p, influences: e.target.value}))} />
+                        <RadioButton name="influences" value="never" label="Never" checked={data.influences === 'never'} onChange={(e: any) => setData(p => ({...p, influences: e.target.value}))} />
                     </div>
                 </div>
 
                 <div className="pt-4 space-y-3">
                     <button type="submit" disabled={!isComplete} className="w-full py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                         Proceed to Assessment
-                    </button>
-                    <button type="button" onClick={onSkip} className="w-full py-2 px-6 bg-transparent text-slate-600 font-semibold rounded-lg hover:bg-slate-100 transition-colors">
-                        Skip this step
                     </button>
                 </div>
             </form>

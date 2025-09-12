@@ -3,8 +3,7 @@ import { NFP_DATA, NFP_SCORE_RANGES, OPERATING_COUNTRIES, PROFESSIONAL_BODIES, A
 import { NfpAnswers, NfpResult, NfpCategoryResult, NfpUserRole, OnboardingData } from '../types';
 import ResultsPage from './ResultsPage';
 import Spinner from './Spinner';
-
-const NFP_STORAGE_KEY = 'nfpAssessmentProgress';
+import { saveAssessmentProgress, loadAssessmentProgress, clearAssessmentProgress } from '../services/assessmentService';
 
 interface NfpAssessmentProps {
   onGoHome: () => void;
@@ -195,11 +194,12 @@ export default function NfpAssessment({ onGoHome, subType }: NfpAssessmentProps)
   const [lastAnswered, setLastAnswered] = useState<{ id: string; answer: boolean } | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    let isMounted = true;
+    const loadProgress = async () => {
         try {
-            const savedProgress = localStorage.getItem(NFP_STORAGE_KEY);
-            if (savedProgress) {
-                const { selectionState: savedState, answers: savedAnswers, currentCategoryIndex: savedIndex, onboardingData: savedOnboarding } = JSON.parse(savedProgress);
+            const savedProgress = await loadAssessmentProgress('nfp');
+            if (isMounted && savedProgress) {
+                const { selectionState: savedState, answers: savedAnswers, currentCategoryIndex: savedIndex, onboardingData: savedOnboarding } = savedProgress;
                 if (savedState && savedState.role && savedAnswers && typeof savedIndex === 'number' && savedOnboarding) {
                     setSelectionState(savedState);
                     setAnswers(savedAnswers);
@@ -211,28 +211,35 @@ export default function NfpAssessment({ onGoHome, subType }: NfpAssessmentProps)
             }
         } catch (error) {
             console.error("Failed to load NFP assessment progress:", error);
-            localStorage.removeItem(NFP_STORAGE_KEY);
+            clearAssessmentProgress('nfp');
         } finally {
-            setIsLoaded(true);
+            if (isMounted) {
+                setIsLoaded(true);
+            }
+        }
+    };
+    
+    const timer = setTimeout(() => {
+        loadProgress();
+    }, 500);
+
+    return () => {
+        isMounted = false;
+        clearTimeout(timer);
+    };
+  }, []);
+  
+  useEffect(() => {
+    const handler = setTimeout(() => {
+        if (isLoaded && selectionState.role && !showResults) {
+            const progress = { selectionState, answers, currentCategoryIndex, onboardingData };
+            saveAssessmentProgress('nfp', progress);
         }
     }, 500);
 
-    return () => clearTimeout(timer);
-  }, []);
-  
-  const saveProgress = () => {
-    if (isLoaded && selectionState.role && !showResults) {
-      try {
-        const progress = { selectionState, answers, currentCategoryIndex, onboardingData };
-        localStorage.setItem(NFP_STORAGE_KEY, JSON.stringify(progress));
-      } catch (error) {
-        console.error("Failed to save NFP assessment progress:", error);
-      }
-    }
-  };
-
-  useEffect(() => {
-    saveProgress();
+    return () => {
+        clearTimeout(handler);
+    };
   }, [selectionState, answers, currentCategoryIndex, showResults, isLoaded, onboardingData]);
 
   const filteredNfpData = useMemo(() => {
@@ -295,7 +302,7 @@ export default function NfpAssessment({ onGoHome, subType }: NfpAssessmentProps)
       setCurrentCategoryIndex(currentCategoryIndex + 1);
     } else {
       setShowResults(true);
-      localStorage.removeItem(NFP_STORAGE_KEY);
+      clearAssessmentProgress('nfp');
     }
   };
   
@@ -306,13 +313,17 @@ export default function NfpAssessment({ onGoHome, subType }: NfpAssessmentProps)
   }
 
   const handleManualSave = () => {
-    saveProgress();
-    setIsSaveConfirmed(true);
-    setTimeout(() => setIsSaveConfirmed(false), 2000);
+    if (isLoaded && selectionState.role && !showResults) {
+        const progress = { selectionState, answers, currentCategoryIndex, onboardingData };
+        saveAssessmentProgress('nfp', progress).then(() => {
+            setIsSaveConfirmed(true);
+            setTimeout(() => setIsSaveConfirmed(false), 2000);
+        });
+    }
   };
 
   const resetSelection = () => {
-      localStorage.removeItem(NFP_STORAGE_KEY);
+      clearAssessmentProgress('nfp');
       setOnboardingData(null);
       setSelectionState({
         step: 'orgType',
@@ -448,7 +459,7 @@ export default function NfpAssessment({ onGoHome, subType }: NfpAssessmentProps)
                     {header("Select Your Role", "To tailor the assessment, please tell us which role best describes your position in the organization.")}
                     <div className="space-y-12">
                         <div>
-                            <h3 className="text-2xl font-bold text-slate-800 mb-6 text-center">Executive Director / CEO / CFO</h3>
+                            <h3 className="text-2xl font-bold text-slate-800 mb-6 text-center">Executive / Board</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                                 {ROLES.filter(r => r.level === 'executive').map(role => (
                                     <SelectionCard 
@@ -533,17 +544,16 @@ export default function NfpAssessment({ onGoHome, subType }: NfpAssessmentProps)
                 <button onClick={resetSelection} className="text-sm text-slate-500 hover:text-slate-800">&larr; Change Selection</button>
             </div>
         </div>
-
+        
         <div className="mb-8">
             <div className="flex justify-between items-end mb-1">
-                <span className="text-base font-medium text-blue-700">Category {currentCategoryIndex + 1} of {filteredNfpData.length}: {currentCategory.title}</span>
-                <span className="text-sm font-medium text-blue-700">{Math.round(((currentCategoryIndex + 1) / filteredNfpData.length) * 100)}% Complete</span>
+                <span className="text-base font-medium text-blue-700">Category {currentCategoryIndex + 1} of {filteredNfpData.length}</span>
+                 <span className="text-sm font-medium text-blue-700">{Math.round(((currentCategoryIndex + 1) / filteredNfpData.length) * 100)}% Complete</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2.5">
                 <div className="bg-blue-600 h-2.5 rounded-full" style={{width: `${((currentCategoryIndex + 1) / filteredNfpData.length) * 100}%`, transition: 'width 0.3s ease-in-out'}}></div>
             </div>
         </div>
-
 
         <div className="flex flex-col md:flex-row gap-8">
             <aside className="w-full md:w-1/3 lg:w-1/4 md:pr-8 md:border-r md:border-slate-200">

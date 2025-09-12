@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { ResponsiveContainer, BarChart, XAxis, YAxis, Tooltip, Bar, RadialBarChart, RadialBar, PolarAngleAxis, Legend } from 'recharts';
 import { ExecutiveResult, NfpResult, AssessmentType } from '../types';
 import { getCustomizedGuidance } from '../services/geminiService';
+import { sendReportByEmail } from '../services/assessmentService';
 import { NFP_BENCHMARK_SCORES, EXECUTIVE_BENCHMARK_SCORES, EXECUTIVE_QUESTIONS, NFP_DATA, INDUSTRY_SPECIFIC_INSIGHTS } from '../constants';
 import Spinner from './Spinner';
 import PrintableSummary from './PrintableSummary';
@@ -242,8 +243,9 @@ const renderNfpResult = (result: NfpResult, chartData: any[] | null, benchmarkLe
                           <YAxis type="category" dataKey="name" width={150} tick={{ fontSize: 10, width: 140 }} interval={0} />
                           <Tooltip formatter={(value) => `${Math.round(value as number)}%`} />
                           <Legend verticalAlign="top" wrapperStyle={{ paddingBottom: '20px' }} />
-                          <Bar dataKey="Your Score" fill="#3b82f6" />
-                          <Bar dataKey="Benchmark" name={`Benchmark (${benchmarkLevel === 'defined' ? 'Defined' : 'Optimized'})`} fill="#9ca3af" />
+                          <Bar dataKey="Overlap" stackId="a" fill="#67e8f9" name="Score Overlap"/>
+                          <Bar dataKey="Your Advantage" stackId="a" fill="#06b6d4" name="Your Advantage"/>
+                          <Bar dataKey="Benchmark Advantage" stackId="a" fill="#e2e8f0" name="Benchmark Advantage"/>
                         </BarChart>
                       </ResponsiveContainer>
                   </div>
@@ -320,10 +322,15 @@ export default function ResultsPage({ result, assessmentType, industry, country,
             const yourPercent = catResult.percentage * 100;
             const benchmarkPercent = benchmarkMaxScore > 0 ? (benchmarkScore / benchmarkMaxScore) * 100 : 0;
             
+            const overlap = Math.min(yourPercent, benchmarkPercent);
+            const yourAdvantage = Math.max(0, yourPercent - benchmarkPercent);
+            const benchmarkAdvantage = Math.max(0, benchmarkPercent - yourPercent);
+
             return {
                 name: catResult.title,
-                'Your Score': yourPercent,
-                'Benchmark': benchmarkPercent,
+                'Overlap': overlap,
+                'Your Advantage': yourAdvantage,
+                'Benchmark Advantage': benchmarkAdvantage,
             };
         });
     }, [result, assessmentType, benchmarkLevel]);
@@ -338,22 +345,6 @@ export default function ResultsPage({ result, assessmentType, industry, country,
         };
         fetchGuidance();
     }, [result, assessmentType, country, industry]);
-
-    const submitEmailAPI = (email: string, message: string): Promise<{ success: boolean; message?: string }> => {
-        console.log("Submitting email to backend:", { email, message });
-        // This is a mock API call. In a real application, you would use fetch()
-        // to send the data to your backend service.
-        return new Promise(resolve => {
-            setTimeout(() => {
-                // Simulate a potential failure
-                if (email.includes('fail')) {
-                     resolve({ success: false, message: "This email address is blocked." });
-                } else {
-                    resolve({ success: true });
-                }
-            }, 1500); // Simulate 1.5s network delay
-        });
-    };
     
     const validateEmail = (email: string) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -385,7 +376,7 @@ export default function ResultsPage({ result, assessmentType, industry, country,
         setEmailError(null);
         setEmailLoading(true);
         try {
-            const response = await submitEmailAPI(email, personalMessage);
+            const response = await sendReportByEmail(email, personalMessage, result, assessmentType, guidance);
             if (response.success) {
                 setSubmitted(true);
             } else {
@@ -400,162 +391,117 @@ export default function ResultsPage({ result, assessmentType, industry, country,
     };
     
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setEmail(e.target.value);
-      if(emailError) {
-        setEmailError(null);
-      }
-    }
-
-    const handleExportPdf = () => {
-        window.print();
+        setEmail(e.target.value);
+        if (emailError) {
+            setEmailError(null);
+        }
     };
 
-    const industryInsights = industry ? INDUSTRY_SPECIFIC_INSIGHTS[industry as keyof typeof INDUSTRY_SPECIFIC_INSIGHTS] : undefined;
-    const showIndustryInsights = assessmentType === 'executive' && industryInsights;
-
-    const narrativeReportContent = (
-      <div className="bg-slate-50 p-6 rounded-xl border border-slate-200">
-        <h3 className="text-2xl font-bold text-slate-800 mb-4">Narrative Risk Report</h3>
-        {loading ? (
-          <div className="flex flex-col items-center justify-center h-64 text-center">
-            <p className="text-slate-600 mt-4 font-semibold text-lg">Analyzing your results and generating insights...</p>
-            <div className="w-full bg-slate-200 rounded-full h-2.5 mt-4 overflow-hidden relative max-w-md mx-auto">
-                <div className="bg-blue-600 h-2.5 rounded-full absolute top-0 left-0 w-1/2 indeterminate-progress-bar"></div>
-            </div>
-          </div>
-        ) : (
-          <div className="text-slate-700 text-sm leading-relaxed prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: markdownToHtml(guidance) }}></div>
-        )}
-      </div>
-    );
-
-    const emailFormContent = (
-      <div className="bg-blue-50 p-6 rounded-xl border-blue-200 no-print">
-        <h3 className="text-2xl font-bold text-blue-800 mb-4">Get Your Full Report</h3>
-        <p className="text-blue-700 mb-6">Receive a detailed PDF of your results and strategic guidance.</p>
-        {submitted ? (
-            <div className="text-center bg-white p-6 rounded-lg">
-                <h4 className="text-xl font-bold text-green-600">Thank You!</h4>
-                <p className="text-slate-600">Your report is on its way to your inbox.</p>
-            </div>
-        ) : (
-            <form onSubmit={handleEmailSubmit} noValidate>
-                <input
-                    type="email"
-                    value={email}
-                    onChange={handleEmailChange}
-                    onBlur={handleEmailBlur}
-                    placeholder="your.email@organization.com"
-                    required
-                    className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:outline-none transition-shadow ${emailError ? 'border-red-500 focus:ring-red-300' : 'border-slate-300 focus:ring-blue-500 focus:border-blue-500'}`}
-                />
-                {emailError && <p className="text-red-600 text-sm mt-2">{emailError}</p>}
-                <textarea
-                    value={personalMessage}
-                    onChange={(e) => setPersonalMessage(e.target.value)}
-                    placeholder="Add an optional personal message to include in the report..."
-                    className="w-full mt-3 px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:outline-none transition-shadow focus:ring-blue-500 focus:border-blue-500"
-                    rows={3}
-                />
-                <button 
-                    type="submit" 
-                    disabled={emailLoading} 
-                    className="w-full mt-4 py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors disabled:opacity-75 disabled:cursor-wait flex items-center justify-center"
-                >
-                    {emailLoading ? (
-                        <>
-                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            Submitting...
-                        </>
-                    ) : (
-                        'Email Me My Report'
-                    )}
-                </button>
-            </form>
-        )}
-      </div>
-    );
-
-    const industryInsightsContent = showIndustryInsights && industryInsights && (
-      <div className="bg-slate-50 p-6 rounded-xl border border-slate-200">
-          <h3 className="text-2xl font-bold text-slate-800 mb-6">Strategic Considerations for the {industry} Industry</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                  <h4 className="text-lg font-semibold text-red-700 mb-3 flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.21 3.03-1.742 3.03H4.42c-1.532 0-2.492-1.696-1.742-3.03l5.58-9.92zM10 13a1 1 0 110-2 1 1 0 010 2zm-1-4a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clipRule="evenodd" />
-                      </svg>
-                      Common Risks to Monitor
-                  </h4>
-                  <ul className="list-disc list-inside space-y-2 text-slate-600 text-sm">
-                      {industryInsights.risks.map((risk, i) => <li key={i}>{risk}</li>)}
-                  </ul>
-              </div>
-              <div>
-                  <h4 className="text-lg font-semibold text-green-700 mb-3 flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M11.983 1.904a1 1 0 00-1.966 0l-3 6A1 1 0 008 9h4a1 1 0 00.983-1.096l-3-6z" />
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v5a1 1 0 102 0V5z" clipRule="evenodd" />
-                      </svg>
-                      Strategic Opportunities
-                  </h4>
-                  <ul className="list-disc list-inside space-y-2 text-slate-600 text-sm">
-                      {industryInsights.opportunities.map((opp, i) => <li key={i}>{opp}</li>)}
-                  </ul>
-              </div>
-          </div>
-      </div>
-    );
-
     return (
-        <>
-            <div className="results-view w-full max-w-6xl mx-auto p-4 md:p-12 bg-white rounded-2xl shadow-xl border border-slate-200 print-container">
-                <header className="text-center border-b pb-8 mb-8 border-slate-200 no-print">
-                    <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2">Your Risk Maturity Results</h2>
-                </header>
-                
-                <div className="mb-12">
-                  {assessmentType === 'executive' ? renderExecutiveResult(result as ExecutiveResult, executiveChartData, benchmarkLevel, setBenchmarkLevel) : renderNfpResult(result as NfpResult, nfpBenchmarkChartData, benchmarkLevel, setBenchmarkLevel)}
+        <div className="w-full max-w-5xl mx-auto p-4 md:p-8">
+            <div className="flex justify-between items-start mb-8">
+                <div>
+                    <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-2">Your Risk Maturity Report</h1>
+                    <p className="text-lg text-slate-600">Here's a detailed breakdown of your assessment results and strategic recommendations.</p>
                 </div>
-                
-                {showIndustryInsights ? (
-                  <>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                      {narrativeReportContent}
-                      {industryInsightsContent}
-                    </div>
-                    <div className="mt-8 max-w-3xl mx-auto">
-                      {emailFormContent}
-                    </div>
-                  </>
-                ) : (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {narrativeReportContent}
-                    {emailFormContent}
-                  </div>
-                )}
+                <button onClick={onRestart} className="py-2 px-6 bg-slate-200 text-slate-700 font-semibold rounded-lg shadow-sm hover:bg-slate-300 transition-colors flex-shrink-0">
+                    Start New Assessment
+                </button>
+            </div>
 
-                <div className="mt-12 text-center flex flex-col sm:flex-row justify-center items-center gap-4 no-print">
-                    <button 
-                        onClick={handleExportPdf} 
-                        className="py-3 px-8 bg-white text-slate-700 font-semibold rounded-lg shadow-sm hover:bg-slate-100 transition-colors border border-slate-300 flex items-center justify-center gap-2"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                      </svg>
-                      Download as PDF
-                    </button>
-                    <button onClick={onRestart} className="py-3 px-8 bg-slate-700 text-white font-semibold rounded-lg shadow-md hover:bg-slate-800 transition-colors">
-                        Start New Assessment
-                    </button>
+            <div className="bg-white p-8 rounded-2xl shadow-xl border border-slate-200">
+                {assessmentType === 'executive' 
+                    ? renderExecutiveResult(result as ExecutiveResult, executiveChartData, benchmarkLevel, setBenchmarkLevel) 
+                    : renderNfpResult(result as NfpResult, nfpBenchmarkChartData, benchmarkLevel, setBenchmarkLevel)
+                }
+            </div>
+
+            {industry && INDUSTRY_SPECIFIC_INSIGHTS[industry] && (
+                <div className="mt-8 bg-white p-8 rounded-2xl shadow-xl border border-slate-200">
+                    <h3 className="text-2xl font-bold text-slate-800 mb-4">Industry-Specific Considerations for {industry}</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 className="font-bold text-lg text-red-600 mb-2">Key Risks</h4>
+                            <ul className="list-disc pl-5 space-y-1 text-slate-700">
+                                {INDUSTRY_SPECIFIC_INSIGHTS[industry].risks.map((risk, i) => <li key={i}>{risk}</li>)}
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-lg text-green-600 mb-2">Strategic Opportunities</h4>
+                            <ul className="list-disc pl-5 space-y-1 text-slate-700">
+                                {INDUSTRY_SPECIFIC_INSIGHTS[industry].opportunities.map((opp, i) => <li key={i}>{opp}</li>)}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <div className="mt-8 bg-white p-8 rounded-2xl shadow-xl border border-slate-200">
+                <h3 className="text-2xl font-bold text-slate-800 mb-4">AI-Powered Strategic Guidance</h3>
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center min-h-[200px]">
+                        <Spinner />
+                        <p className="mt-4 text-slate-600">Generating your customized report...</p>
+                    </div>
+                ) : (
+                    <div className="prose prose-slate max-w-none" dangerouslySetInnerHTML={{ __html: markdownToHtml(guidance) }}></div>
+                )}
+            </div>
+            
+            <div className="mt-8 bg-slate-50 p-8 rounded-2xl border border-slate-200">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 className="text-2xl font-bold text-slate-800 mb-2">Get a Copy of Your Report</h3>
+                        <p className="text-slate-600 mb-4">Enter your email address to receive a detailed PDF summary of your results and recommendations.</p>
+                        
+                        {submitted ? (
+                            <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-md">
+                                <p className="font-bold">Report Sent!</p>
+                                <p>Please check your inbox (and spam folder) for the report.</p>
+                            </div>
+                        ) : (
+                            <form onSubmit={handleEmailSubmit} noValidate>
+                                <div className="mb-4">
+                                    <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        value={email}
+                                        onChange={handleEmailChange}
+                                        onBlur={handleEmailBlur}
+                                        placeholder="you@company.com"
+                                        className={`w-full px-3 py-2 bg-white border rounded-md shadow-sm focus:outline-none focus:ring-1 ${emailError ? 'border-red-500 ring-red-500' : 'border-slate-300 focus:ring-blue-500 focus:border-blue-500'}`}
+                                    />
+                                    {emailError && <p className="mt-1 text-sm text-red-600">{emailError}</p>}
+                                </div>
+                                <div className="mb-4">
+                                    <label htmlFor="personalMessage" className="block text-sm font-medium text-slate-700 mb-1">Personal Message (Optional)</label>
+                                    <textarea
+                                        id="personalMessage"
+                                        value={personalMessage}
+                                        onChange={(e) => setPersonalMessage(e.target.value)}
+                                        placeholder="Add a note to the report..."
+                                        rows={2}
+                                        className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    disabled={emailLoading}
+                                    className="w-full py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-wait flex items-center justify-center"
+                                >
+                                    {emailLoading ? <Spinner /> : 'Email Me The Report'}
+                                </button>
+                            </form>
+                        )}
+                    </div>
+                    <div className="hidden md:block">
+                        <div className="bg-white p-4 rounded-lg shadow-lg border border-slate-200 h-96 overflow-y-auto">
+                            <PrintableSummary result={result} assessmentType={assessmentType} guidance={guidance} />
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div className="hidden printable-summary">
-                {!loading && <PrintableSummary result={result} assessmentType={assessmentType} guidance={guidance} />}
-            </div>
-        </>
+        </div>
     );
 }

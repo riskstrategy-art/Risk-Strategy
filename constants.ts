@@ -58,7 +58,7 @@ export const EXECUTIVE_QUESTIONS: ExecutiveQuestion[] = [
   {
     id: 2,
     category: 'Governance & Culture',
-    question: 'Does your organization have a formally documented and board-approved Risk Appetite Statement that guides strategic decisions?',
+    question: 'Does your organization have a formally documented and board-approved Risk Appetite Statement?',
     role: 'csuite',
   },
   {
@@ -397,7 +397,7 @@ export const EXECUTIVE_QUESTIONS: ExecutiveQuestion[] = [
   {
     id: 57,
     category: 'Data Protection & Whistleblowing',
-    question: "Are your organization's data handling practices aligned with the 13 Information Privacy Principles of New Zealand's Privacy Act 2020?",
+    question: "Are your data handling practices aligned with the 13 Information Privacy Principles of New Zealand's Privacy Act 2020?",
     country: 'New Zealand'
   },
   {
@@ -670,6 +670,265 @@ export const EXECUTIVE_QUESTIONS: ExecutiveQuestion[] = [
     category: 'Talent & Culture',
     question: "Does your organization have a proactive strategy to mitigate the risks of global talent shortages for specialized skills like AI and cybersecurity?",
     industry: 'ICT'
+  },
+  {
+    id: 101,
+    category: 'ESG & Reputational Risk',
+    question: "Is managing sustainability and ethical sourcing risks within your supply chain a board-level priority, with clear metrics for performance tracking?",
+    industry: 'Retail',
+    role: 'csuite'
+  },
+  {
+    id: 102,
+    category: 'Risk Response',
+    question: "Does your organization employ a sophisticated hedging strategy or other financial instruments to mitigate risks from commodity price volatility?",
+    industry: 'Energy'
+  },
+  {
+    id: 103,
+    category: 'Technology & Cybersecurity',
+    question: "Does your organization have a formal strategy to address the risks and opportunities of health data interoperability and participation in larger health information exchanges?",
+    industry: 'Health'
+  },
+  {
+    id: 104,
+    category: 'Governance & Culture',
+    question: 'Is the Risk Appetite Statement effectively communicated to and understood by relevant employees to guide their day-to-day decisions?',
+    role: 'csuite',
+    dependsOn: { questionId: 2, requiredValue: true },
+  },
+  {
+    id: 105,
+    category: 'Governance & Culture',
+    question: 'Is adherence to the Risk Appetite Statement a formal, evidence-based checkpoint in key decision-making processes (e.g., major investments, new market entry)?',
+    role: 'csuite',
+    dependsOn: { questionId: 2, requiredValue: true },
+  },
+  {
+    id: 106,
+    category: 'Industry Specific',
+    question: "Does your organization utilize advanced analytics or AI models to improve demand forecasting and minimize inventory distortion (e.g., stockouts, overstocks)?",
+    industry: 'Retail'
+  },
+  {
+    id: 107,
+    category: 'Industry Specific',
+    question: "Is there a formal strategy to integrate experiential elements into your physical stores to drive foot traffic and enhance brand loyalty?",
+    industry: 'Retail'
+  },
+  {
+    id: 108,
+    category: 'Industry Specific',
+    question: "Has the board formally quantified and ring-fenced provisions for the long-term asset retirement and decommissioning liabilities of your infrastructure?",
+    industry: 'Energy',
+    role: 'csuite'
+  },
+  {
+    id: 109,
+    category: 'Industry Specific',
+    question: "Is your organization actively investing in 'Energy-as-a-Service' or similar business models to diversify revenue streams beyond traditional commodity sales?",
+    industry: 'Energy'
+  },
+  {
+    id: 110,
+    category: 'Industry Specific',
+    question: "Does your cybersecurity framework specifically address the unique risks of networked medical devices (IoMT), including a formal process for patch and vulnerability management?",
+    industry: 'Health'
+  },
+  {
+    id: 111,
+    category: 'Industry Specific',
+    question: "Is your organization formally transitioning towards value-based care models, with established metrics to track patient outcomes against costs?",
+    industry: 'Health',
+    role: 'csuite'
+  },
+  {
+    id: 112,
+    category: 'Governance & Culture',
+    question: 'Does your organization have a formal process for granting and tracking exceptions to the Risk Appetite Statement?',
+    role: 'csuite',
+    dependsOn: { questionId: 2, requiredValue: true },
+  },
+  {
+    id: 113,
+    category: 'Governance & Culture',
+    question: 'Are risk-related Key Performance Indicators (KPIs), which are aligned with the Risk Appetite Statement, used to measure and report on performance?',
+    role: 'csuite',
+    dependsOn: { questionId: 2, requiredValue: true },
+  },
+  {
+    id: 114,
+    category: 'Industry Specific',
+    question: "Does your organization's strategy include a formal risk assessment of both online competition and physical retail footprint optimization?",
+    industry: 'Retail',
+    role: 'csuite',
+  },
+  {
+    id: 115,
+    category: 'Industry Specific',
+    question: 'Is there a resilient, multi-sourced supply chain strategy in place, tested against major disruption scenarios (e.g., geopolitical, climate)?',
+    industry: 'Retail',
+  },
+  {
+    id: 116,
+    category: 'Industry Specific',
+    question: 'Has the board formally reviewed and quantified the financial risks associated with stranded assets due to decarbonization targets?',
+    industry: 'Energy',
+    role: 'csuite',
+  },
+  {
+    id: 117,
+    category: 'Industry Specific',
+    question: 'Does your organization have a strategic framework for managing the operational risks of integrating intermittent renewable energy sources into the grid?',
+    industry: 'Energy',
+  },
+  {
+    id: 118,
+    category: 'Industry Specific',
+    question: 'Does your organization have a formal risk management framework for clinical trial integrity, including data validity and ethical oversight?',
+    industry: 'Health',
+  },
+  {
+    id: 119,
+    category: 'Industry Specific',
+    question: 'Is there a proactive strategy to manage the reputational and operational risks associated with public health crises and pandemic response?',
+    industry: 'Health',
+    role: 'csuite',
+  },
+  {
+    id: 120,
+    category: 'Industry Specific',
+    question: 'Does your organization have a formal strategy to manage the risks of network sharing agreements and infrastructure dependencies on other carriers?',
+    industry: 'Telecoms',
+    role: 'csuite',
+  },
+  {
+    id: 121,
+    category: 'Industry Specific',
+    question: 'Is there a proactive risk management process to address customer churn and price erosion in a highly saturated market?',
+    industry: 'Telecoms',
+  },
+  {
+    id: 126,
+    category: 'Governance & Culture',
+    question: 'Is training on the Risk Appetite Statement a mandatory part of the onboarding and annual refresher programs for employees in relevant roles?',
+    role: 'csuite',
+    dependsOn: { questionId: 2, requiredValue: true },
+  },
+  {
+    id: 127,
+    category: 'Governance & Culture',
+    question: 'Does the board or a dedicated risk committee formally review a summary of decisions that required an exception to the Risk Appetite Statement at least quarterly?',
+    role: 'csuite',
+    dependsOn: { questionId: 2, requiredValue: true },
+  },
+  {
+    id: 128,
+    category: 'Industry Specific',
+    question: 'Does your long-term strategy include scenario analysis for the geopolitical risks associated with critical mineral supply chains required for the energy transition (e.g., lithium, cobalt)?',
+    industry: 'Energy',
+    role: 'csuite',
+  },
+  {
+    id: 129,
+    category: 'Industry Specific',
+    question: 'Does your organization have a formal, tested crisis management plan specifically for a prolonged disruption to critical energy infrastructure resulting from a coordinated cyber-physical attack?',
+    industry: 'Energy',
+    role: 'csuite',
+  },
+  {
+    id: 130,
+    category: 'Industry Specific',
+    question: 'Does your organization have a formal ethical review framework, overseen by the board, for the use of AI in clinical decision-making, including processes to manage algorithmic bias?',
+    industry: 'Health',
+    role: 'csuite',
+  },
+  {
+    id: 131,
+    category: 'Industry Specific',
+    question: 'Does your strategic workforce planning explicitly address the risk of clinician burnout and the need for new digital skills driven by the adoption of telehealth?',
+    industry: 'Health',
+  },
+  {
+    id: 132,
+    category: 'Industry Specific',
+    question: 'Does your long-term strategic planning include scenario analysis for geopolitical risks that could disrupt critical energy supply chains (e.g., regional conflicts, nationalization of assets)?',
+    industry: 'Energy',
+    role: 'csuite',
+  },
+  {
+    id: 133,
+    category: 'Industry Specific',
+    question: 'Does your organization have a formal strategy to ensure the resilience and availability of a specialized workforce for operating and maintaining critical energy infrastructure during crises?',
+    industry: 'Energy',
+  },
+  {
+    id: 134,
+    category: 'Industry Specific',
+    question: 'Does your organization have a proactive process for monitoring and adapting to risks from changing healthcare reimbursement models and payer policies?',
+    industry: 'Health',
+    role: 'csuite',
+  },
+  {
+    id: 135,
+    category: 'Industry Specific',
+    question: 'Is there a formal risk management framework to address the operational resilience and potential failures of critical AI-driven diagnostic or treatment systems?',
+    industry: 'Health',
+  },
+  {
+    id: 136,
+    category: 'Industry Specific',
+    question: "Is your organization actively developing or investing in long-duration energy storage solutions to mitigate intermittency risks from renewables?",
+    industry: 'Energy',
+    role: 'csuite',
+  },
+  {
+    id: 137,
+    category: 'Industry Specific',
+    question: "Does your organization's risk modeling account for the cascading failure potential between energy infrastructure and other critical sectors (e.g., water, telecoms)?",
+    industry: 'Energy',
+    role: 'csuite',
+  },
+  {
+    id: 138,
+    category: 'Industry Specific',
+    question: "Does your organization have a formal strategy for managing the risk of counterfeit pharmaceuticals and medical devices entering your supply chain?",
+    industry: 'Health',
+  },
+  {
+    id: 139,
+    category: 'Industry Specific',
+    question: "Is there a board-level approved framework for managing the ethical and reputational risks associated with genomic data collection and use?",
+    industry: 'Health',
+    role: 'csuite',
+  },
+  {
+    id: 140,
+    category: 'Governance & Culture',
+    question: "Are risk tolerances, as defined in the Risk Appetite Statement, explicitly linked to capital allocation decisions for major projects?",
+    role: 'csuite',
+    dependsOn: { questionId: 2, requiredValue: true },
+  },
+  {
+    id: 141,
+    category: 'Governance & Culture',
+    question: "Does your organization's internal audit function provide independent assurance on the effectiveness of the Risk Appetite Statement's implementation?",
+    role: 'csuite',
+    dependsOn: { questionId: 2, requiredValue: true },
+  },
+  {
+    id: 142,
+    category: 'Governance & Culture',
+    question: 'Does the Risk Appetite Statement systematically influence key business decisions?',
+    role: 'csuite',
+    dependsOn: { questionId: 2, requiredValue: true },
+  },
+  {
+    id: 143,
+    category: 'Governance & Culture',
+    question: 'Is a formal Risk Appetite Statement currently in development?',
+    role: 'csuite',
+    dependsOn: { questionId: 2, requiredValue: false },
   }
 ];
 
@@ -1051,13 +1310,15 @@ export const INDUSTRY_SPECIFIC_INSIGHTS: Record<string, {risks: string[], opport
             'High capital expenditure required for infrastructure upgrades (e.g., 5G).',
             'Intense market competition and pressure on average revenue per user (ARPU).',
             'Evolving cybersecurity threats against network infrastructure.',
-            'Regulatory changes related to data sovereignty, privacy, and net neutrality.'
+            'Regulatory changes related to data sovereignty, privacy, and net neutrality.',
+            'Managing the complexity and cost of decommissioning legacy network infrastructure.'
         ],
         opportunities: [
             'Expanding 5G services to enable new applications like IoT and autonomous vehicles.',
             'Offering value-added services such as cloud computing, streaming, and cybersecurity.',
             'Investing in fiber optic infrastructure to meet growing data demands.',
-            'Partnering with other industries to create new connected solutions (e.g., smart cities).'
+            'Partnering with other industries to create new connected solutions (e.g., smart cities).',
+            'Leveraging network data and AI for predictive maintenance and optimized network performance.'
         ]
     },
     'Fintech': {
