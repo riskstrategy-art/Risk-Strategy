@@ -1,7 +1,7 @@
 import { AssessmentType, ExecutiveResult, NfpResult } from '../types';
 
 // The base URL for your Firebase Cloud Functions
-const BASE_FUNCTION_URL = 'https://us-central1-your-project-id.cloudfunctions.net'; // <-- REPLACE with your project ID
+const BASE_FUNCTION_URL = 'https://us-central1-risk-maturity-snapshot.cloudfunctions.net';
 
 // --- Progress Persistence Service ---
 // This service abstracts the data storage. Currently, it uses localStorage,
@@ -12,6 +12,7 @@ const BASE_FUNCTION_URL = 'https://us-central1-your-project-id.cloudfunctions.ne
 const getStorageKey = (assessmentType: AssessmentType) => `${assessmentType}AssessmentProgress`;
 
 export const saveAssessmentProgress = async (assessmentType: AssessmentType, progress: any): Promise<{ success: boolean }> => {
+    /*
     try {
         localStorage.setItem(getStorageKey(assessmentType), JSON.stringify(progress));
         return { success: true };
@@ -19,8 +20,8 @@ export const saveAssessmentProgress = async (assessmentType: AssessmentType, pro
         console.error("Failed to save progress to localStorage:", error);
         return { success: false };
     }
+    */
     
-    /*
     // FIREBASE IMPLEMENTATION EXAMPLE:
     const functionUrl = `${BASE_FUNCTION_URL}/saveProgress`;
     try {
@@ -36,10 +37,10 @@ export const saveAssessmentProgress = async (assessmentType: AssessmentType, pro
         console.error('Error saving progress to Firebase:', error);
         return { success: false };
     }
-    */
 };
 
 export const loadAssessmentProgress = async (assessmentType: AssessmentType): Promise<any | null> => {
+    /*
      try {
         const savedProgress = localStorage.getItem(getStorageKey(assessmentType));
         return savedProgress ? JSON.parse(savedProgress) : null;
@@ -47,8 +48,8 @@ export const loadAssessmentProgress = async (assessmentType: AssessmentType): Pr
         console.error("Failed to load progress from localStorage:", error);
         return null;
     }
+    */
     
-    /*
     // FIREBASE IMPLEMENTATION EXAMPLE:
     const userId = "some_user_id";
     const functionUrl = `${BASE_FUNCTION_URL}/loadProgress?userId=${userId}&assessmentType=${assessmentType}`;
@@ -63,7 +64,6 @@ export const loadAssessmentProgress = async (assessmentType: AssessmentType): Pr
         console.error('Error loading progress from Firebase:', error);
         return null;
     }
-    */
 };
 
 export const clearAssessmentProgress = (assessmentType: AssessmentType): void => {
